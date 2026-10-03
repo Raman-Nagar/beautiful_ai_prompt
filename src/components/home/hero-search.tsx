@@ -42,7 +42,7 @@ export function HeroSearch() {
         <form
           onSubmit={handleSearchSubmit}
           onClick={() => openSearch(inputValue || undefined)}
-          className="relative flex items-center w-full h-14 sm:h-[60px] rounded-2xl border border-[var(--border-strong)] bg-[var(--card)]/90 px-4 sm:px-5 shadow-[0_2px_20px_-4px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all duration-200 group-hover:border-[var(--primary)]/50 cursor-pointer"
+          className="relative flex items-center w-full h-14 sm:h-[60px] rounded-2xl border border-[var(--border-strong)] bg-[var(--card)]/95 px-4 sm:px-5 shadow-[var(--shadow-md)] group-hover:shadow-[var(--shadow-lg)] backdrop-blur-md transition-all duration-200 group-hover:border-[var(--primary)]/50 cursor-pointer"
         >
           <Search className="h-4.5 w-4.5 text-[var(--muted-foreground)] group-hover:text-[var(--primary)] transition-colors shrink-0 mr-3.5" />
 

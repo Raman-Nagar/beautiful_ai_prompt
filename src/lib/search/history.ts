@@ -5,7 +5,9 @@ import { useSyncExternalStore } from "react";
 const RECENT_SEARCHES_KEY = "bap_recent_searches";
 const MAX_RECENT_SEARCHES = 8;
 
-let recentCache: string[] = [];
+const EMPTY_RECENT_SEARCHES: string[] = [];
+let lastRecentRaw: string | null = null;
+let recentCache: string[] = EMPTY_RECENT_SEARCHES;
 const listeners = new Set<() => void>();
 
 function notify() {
@@ -27,10 +29,13 @@ function subscribe(callback: () => void) {
 }
 
 export function getRecentSearches(): string[] {
-  if (typeof window === "undefined") return recentCache;
+  if (typeof window === "undefined") return EMPTY_RECENT_SEARCHES;
   try {
     const raw = localStorage.getItem(RECENT_SEARCHES_KEY);
-    recentCache = raw ? JSON.parse(raw) : [];
+    if (raw !== lastRecentRaw) {
+      lastRecentRaw = raw;
+      recentCache = raw ? JSON.parse(raw) : EMPTY_RECENT_SEARCHES;
+    }
     return recentCache;
   } catch {
     return recentCache;
@@ -92,7 +97,7 @@ export function useRecentSearches(): {
   const recentSearches = useSyncExternalStore(
     subscribe,
     getRecentSearches,
-    () => []
+    () => EMPTY_RECENT_SEARCHES
   );
 
   return {

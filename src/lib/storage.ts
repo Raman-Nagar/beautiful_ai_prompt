@@ -5,8 +5,9 @@ import { useSyncExternalStore } from "react";
 const SAVED_PROMPTS_KEY = "bap_saved_prompts";
 const THEME_KEY = "bap_theme";
 
-// In-memory cache for SSR hydration safety
-let savedCache: string[] = [];
+const EMPTY_SAVED_IDS: string[] = [];
+let lastSavedRaw: string | null = null;
+let savedCache: string[] = EMPTY_SAVED_IDS;
 let themeCache: "dark" | "light" | "system" = "dark";
 
 const listeners = new Set<() => void>();
@@ -30,10 +31,13 @@ function subscribe(callback: () => void) {
 }
 
 export function getSavedPromptIds(): string[] {
-  if (typeof window === "undefined") return savedCache;
+  if (typeof window === "undefined") return EMPTY_SAVED_IDS;
   try {
     const raw = localStorage.getItem(SAVED_PROMPTS_KEY);
-    savedCache = raw ? JSON.parse(raw) : [];
+    if (raw !== lastSavedRaw) {
+      lastSavedRaw = raw;
+      savedCache = raw ? JSON.parse(raw) : EMPTY_SAVED_IDS;
+    }
     return savedCache;
   } catch {
     return savedCache;
@@ -54,7 +58,9 @@ export function toggleSavedPromptId(id: string): boolean {
     isNowSaved = true;
   }
 
-  localStorage.setItem(SAVED_PROMPTS_KEY, JSON.stringify(updated));
+  const serialized = JSON.stringify(updated);
+  localStorage.setItem(SAVED_PROMPTS_KEY, serialized);
+  lastSavedRaw = serialized;
   savedCache = updated;
   notify();
   return isNowSaved;
@@ -64,7 +70,7 @@ export function useSavedPromptIds(): string[] {
   return useSyncExternalStore(
     subscribe,
     getSavedPromptIds,
-    () => []
+    () => EMPTY_SAVED_IDS
   );
 }
 
