@@ -23,7 +23,7 @@ export default function NotFound() {
     <>
       <title>404 - Page Not Found | Beautiful AI Prompt</title>
       <meta name="robots" content="noindex, follow" />
-      <main className="min-h-[75vh] flex items-center justify-center py-16 bg-[var(--background)]">
+      <div className="min-h-[75vh] flex items-center justify-center py-16 bg-[var(--background)]">
       <Container size="narrow">
         <div className="text-center space-y-6">
           {/* Subtle error code badge */}
@@ -53,7 +53,7 @@ export default function NotFound() {
             >
               <span className="flex items-center gap-2">
                 <Search className="h-4 w-4 text-[var(--primary)]" />
-                <span>Search 25+ production prompts...</span>
+                <span>Search 200+ production prompts...</span>
               </span>
               <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-[var(--secondary)] border border-[var(--border)] text-[10px] font-mono">
                 ⌘K
@@ -139,7 +139,7 @@ export default function NotFound() {
           </div>
         </div>
       </Container>
-    </main>
+    </div>
     </>
   );
 }

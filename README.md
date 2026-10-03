@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Beautiful AI Prompt
+
+> The premium AI prompt discovery and productivity platform. Curated, battle-tested, and practical prompt engineering templates for software developers, marketers, creators, job seekers, and business operators.
+
+---
+
+## Overview
+
+**Beautiful AI Prompt** is a local-first, privacy-respecting, high-performance static web application built with modern Next.js App Router and TypeScript. It provides 225+ rigorous prompts with interactive variable customization, zero runtime tracking, and seamless copy-to-clipboard workflows.
+
+### Core Stack
+- **Framework:** [Next.js 16.3.8](https://nextjs.org) (App Router, Turbopack)
+- **UI Library:** [React 19.2.8](https://react.dev)
+- **Type Safety:** [TypeScript 5](https://www.typescriptlang.org)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com) with CSS custom properties design tokens
+- **Icons:** [Lucide React](https://lucide.dev)
+- **Deployment Target:** [Vercel](https://vercel.com) (Static Site Generation / SSG)
+
+---
+
+## Catalog Architecture
+
+- **Prompts:** 225 production-grade prompts spanning Coding, Career, Marketing, Business, Design, Writing, and Education.
+- **Categories:** 26 specialized domain taxonomy routes with bidirectional cross-linking.
+- **Collections:** 22 curated workflow suites grouping complementary prompts into end-to-end playbooks.
+- **Guides:** 12 in-depth prompt engineering guides covering system prompt architecture, few-shot prompting, and hallucination reduction.
+- **Pages:** 300 statically pre-rendered HTML routes generated at build time.
+
+---
 
 ## Getting Started
 
-First, run the development server:
-
+### 1. Install Dependencies
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Run Local Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Production Quality & Validation Suite
+```bash
+# Validate prompt schemas, variable brackets, cross-refs, and uniqueness
+npm run validate:content
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Validate metadata, canonical URLs, sitemap, and internal link graph
+npm run validate:seo
 
-## Learn More
+# Lint codebase
+npm run lint
 
-To learn more about Next.js, take a look at the following resources:
+# Build static production bundle
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment Variables
 
-## Deploy on Vercel
+All environment variables are optional. When unset, the application automatically uses production fallbacks:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Variable | Scope | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `NEXT_PUBLIC_SITE_URL` | Public | Canonical production domain URL | `https://beautifulaiprompt.com` |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Public | Google Search Console site verification code | *None* |
+| `NEXT_PUBLIC_ANALYTICS_DEBUG` | Public | Enables verbose console logging for analytics events | `false` |
+| `NEXT_PUBLIC_ANALYTICS_ENDPOINT` | Public | Optional custom Beacon endpoint for privacy event logging | *None* |
+| `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | Public | Optional Google AdSense publisher ID (e.g. `ca-pub-xxx`) | *None (Dormant)* |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> **Security Note:** Secrets must never be prefixed with `NEXT_PUBLIC_`. Beautiful AI Prompt is architecturally serverless and static in Phase 1.
+
+---
+
+## Deployment to Vercel
+
+1. Push repository to GitHub or GitLab.
+2. Import repository in [Vercel](https://vercel.com/new).
+3. Framework Preset: **Next.js**
+4. Build Command: `npm run build`
+5. Output Directory: `.next` (default)
+6. Add custom domain: `beautifulaiprompt.com` with automated SSL/TLS certificate.
+
+---
+
+## License & Intellectual Property
+
+Prompts published on Beautiful AI Prompt are free to copy, modify, and integrate into personal and commercial projects. See [Terms of Service](https://beautifulaiprompt.com/terms) and [Privacy Policy](https://beautifulaiprompt.com/privacy-policy) for details.

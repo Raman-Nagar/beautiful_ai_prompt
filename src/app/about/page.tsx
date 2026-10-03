@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "About Us — Elevating Real-World AI Productivity",
+  title: "About Us",
   description:
     "Learn what Beautiful AI Prompt is, the problem we solve, who our prompt library is built for, and how our structured prompts are organized.",
   path: "/about",

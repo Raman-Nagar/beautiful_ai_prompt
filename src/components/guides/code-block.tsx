@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Copy, Check, Terminal } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, copyToClipboard } from "@/lib/utils";
 
 interface CodeBlockProps {
   code: string;
@@ -19,10 +19,12 @@ export function CodeBlock({
 }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopy = async () => {
+    const ok = await copyToClipboard(code);
+    if (ok) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (

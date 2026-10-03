@@ -34,10 +34,18 @@ export function getRecentSearches(): string[] {
     const raw = localStorage.getItem(RECENT_SEARCHES_KEY);
     if (raw !== lastRecentRaw) {
       lastRecentRaw = raw;
-      recentCache = raw ? JSON.parse(raw) : EMPTY_RECENT_SEARCHES;
+      if (!raw) {
+        recentCache = EMPTY_RECENT_SEARCHES;
+      } else {
+        const parsed = JSON.parse(raw);
+        recentCache = Array.isArray(parsed)
+          ? parsed.filter((item): item is string => typeof item === "string")
+          : EMPTY_RECENT_SEARCHES;
+      }
     }
     return recentCache;
   } catch {
+    recentCache = EMPTY_RECENT_SEARCHES;
     return recentCache;
   }
 }

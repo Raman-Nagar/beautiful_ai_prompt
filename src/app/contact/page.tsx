@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "Contact & Community Feedback — Beautiful AI Prompt",
+  title: "Contact & Community Feedback",
   description:
     "Get in touch with the Beautiful AI Prompt team. Submit prompts, suggest categories, report issues, or contribute feedback.",
   path: "/contact",
@@ -121,7 +121,7 @@ export default function ContactPage() {
               {/* Contact Method Placeholder Card */}
               <Card className="p-6 space-y-4 bg-[var(--card)] border-[var(--border)]">
                 <h3 className="text-sm font-bold text-[var(--foreground)] uppercase tracking-wider">
-                  Contact Channel Placeholder
+                  Editorial &amp; Review Channels
                 </h3>
                 <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
                   Direct communication is handled through our interactive web form. For open-source

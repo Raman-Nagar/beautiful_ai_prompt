@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Prompt } from "@/types/prompt";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
-import { cn } from "@/lib/utils";
+import { cn, copyToClipboard } from "@/lib/utils";
 import { useSavedPromptIds, toggleSavedPromptId } from "@/lib/storage";
 import { trackPromptCopy, trackPromptSave } from "@/lib/analytics";
 import {
@@ -26,13 +26,18 @@ export function PromptCard({ prompt, className }: PromptCardProps) {
   const savedIds = useSavedPromptIds();
   const isSaved = savedIds.includes(prompt.id);
 
-  const handleCopy = (e: React.MouseEvent) => {
+  const handleCopy = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    navigator.clipboard.writeText(prompt.prompt || prompt.template || "");
-    setIsCopied(true);
-    success(`Copied "${prompt.title}" to clipboard!`);
+    const textToCopy = prompt.prompt || prompt.template || "";
+    const ok = await copyToClipboard(textToCopy);
+    if (ok) {
+      setIsCopied(true);
+      success(`Copied "${prompt.title}" to clipboard!`);
+    } else {
+      success(`Unable to copy automatically.`);
+    }
 
     trackPromptCopy({
       promptId: prompt.id,

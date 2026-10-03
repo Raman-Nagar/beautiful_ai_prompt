@@ -3,6 +3,8 @@ import { getPromptById } from "./prompts";
 import { Collection } from "@/types/collection";
 import { Prompt } from "@/types/prompt";
 
+export { COLLECTIONS };
+
 /**
  * Retrieves all curated collections
  */
@@ -103,3 +105,11 @@ export function getCollectionsByCategory(categorySlug: string, limit: number = 2
   const others = COLLECTIONS.filter((c) => !matching.some((m) => m.id === c.id));
   return [...matching, ...others].slice(0, limit);
 }
+
+/**
+ * Retrieves collections that include a specific prompt ID
+ */
+export function getCollectionsForPrompt(promptId: string): Collection[] {
+  return COLLECTIONS.filter((col) => col.promptIds.includes(promptId));
+}
+

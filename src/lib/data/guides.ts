@@ -1,7 +1,11 @@
 import { GUIDES } from "@/data/guides";
 import { getPromptById } from "./prompts";
+import { getCollectionBySlug } from "./collections";
 import { Guide } from "@/types/guide";
 import { Prompt } from "@/types/prompt";
+import { Collection } from "@/types/collection";
+
+export { GUIDES };
 
 /**
  * Retrieves all published guides
@@ -25,10 +29,10 @@ export function getGuideById(id: string): Guide | undefined {
 }
 
 /**
- * Retrieves featured guides
+ * Retrieves featured guides (maximum 4 editorial guides)
  */
 export function getFeaturedGuides(): Guide[] {
-  return GUIDES.filter((g) => g.featured);
+  return GUIDES.filter((g) => g.featured).slice(0, 4);
 }
 
 /**
@@ -43,7 +47,7 @@ export function getLatestGuides(limit: number = 3): Guide[] {
 /**
  * Retrieves related guides for a given guide
  */
-export function getRelatedGuides(currentSlug: string, limit: number = 2): Guide[] {
+export function getRelatedGuides(currentSlug: string, limit: number = 3): Guide[] {
   const current = getGuideBySlug(currentSlug);
   if (!current) return [];
 
@@ -79,7 +83,18 @@ export function getRelatedGuides(currentSlug: string, limit: number = 2): Guide[
  * Resolves full Prompt objects mentioned in a guide
  */
 export function getGuidePrompts(guide: Guide): Prompt[] {
-  return guide.relatedPromptIds
+  const ids = guide.relatedPromptIds || guide.promptIds || [];
+  return ids
     .map((id) => getPromptById(id))
     .filter((p): p is Prompt => p !== undefined);
+}
+
+/**
+ * Resolves full Collection objects linked to a guide
+ */
+export function getGuideCollections(guide: Guide): Collection[] {
+  const slugs = guide.relatedCollectionSlugs || [];
+  return slugs
+    .map((slug) => getCollectionBySlug(slug))
+    .filter((c): c is Collection => c !== undefined);
 }

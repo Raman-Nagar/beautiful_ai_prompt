@@ -13,7 +13,6 @@ import {
   getRelatedCategories,
 } from "@/lib/data/categories";
 import { getPromptsByCategory } from "@/lib/data/prompts";
-import { getCollectionsByCategory } from "@/lib/data/collections";
 import {
   TrackedCategoryLink,
   TrackedCollectionLink,
@@ -26,7 +25,11 @@ import {
   Cpu,
   Target,
   Compass,
+  BookOpen,
+  ChevronRight,
 } from "lucide-react";
+import { GuideCard } from "@/components/guides/guide-card";
+import { getGuidesForCategory, getCollectionsForCategory } from "@/lib/internal-links";
 
 import { constructMetadata, generateCategoryJsonLd } from "@/lib/seo";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
@@ -37,10 +40,9 @@ interface CategoryPageProps {
 
 export async function generateStaticParams() {
   const categories = getAllCategories();
-  const baseParams = categories.map((c) => ({
+  return categories.map((c) => ({
     slug: c.slug,
   }));
-  return [...baseParams, { slug: "development" }];
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
@@ -51,6 +53,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     return {
       title: "Category Not Found",
       description: "The requested prompt category could not be found.",
+      robots: { index: false, follow: false },
     };
   }
 
@@ -77,7 +80,8 @@ export default async function CategoryDetailPage({ params }: CategoryPageProps) 
 
   const prompts = getPromptsByCategory(category.slug);
   const relatedCategories = getRelatedCategories(category.slug, 4);
-  const relatedCollections = getCollectionsByCategory(category.slug, 2);
+  const relatedCollections = getCollectionsForCategory(category.slug, 2);
+  const relatedGuides = getGuidesForCategory(category.slug, 2);
 
   // Truthful JSON-LD Schema (CollectionPage) without any fake ratings
   const jsonLd = generateCategoryJsonLd(category, prompts);
@@ -367,6 +371,43 @@ export default async function CategoryDetailPage({ params }: CategoryPageProps) 
                     </div>
                   </Card>
                 </TrackedCategoryLink>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Related Guides & Playbooks Section */}
+        {relatedGuides.length > 0 && (
+          <section className="pt-12 border-t border-[var(--border)]">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-[var(--primary)]" />
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+                    Related Engineering Guides
+                  </h2>
+                </div>
+                <p className="text-xs text-[var(--muted-foreground)] mt-1">
+                  System prompt architectures, playbooks, and best practices for {category.name}.
+                </p>
+              </div>
+
+              <Link
+                href="/guides"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--primary)] hover:underline"
+              >
+                <span>View all guides</span>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {relatedGuides.map((guide) => (
+                <GuideCard
+                  key={guide.id}
+                  guide={guide}
+                  sourcePage={`/categories/${category.slug}`}
+                />
               ))}
             </div>
           </section>

@@ -23,13 +23,20 @@ export interface Guide {
   id: string;
   slug: string;
   title: string;
+  excerpt: string;
   description: string;
+  /** Full text content or markdown representation */
+  content?: string;
+  /** Backward compatibility alias for excerpt */
+  summary?: string;
   category: string;
+  categoryIds?: string[];
   readingTime: string;
+  readingTimeMinutes?: number;
   publishedAt: string;
-  updatedAt?: string;
-  featured?: boolean;
-  author: {
+  updatedAt: string;
+  featured: boolean;
+  author?: {
     name: string;
     role: string;
     avatar?: string;
@@ -37,8 +44,10 @@ export interface Guide {
   tableOfContents: TableOfContentsItem[];
   sections: GuideSection[];
   relatedPromptIds: string[];
+  promptIds?: string[];
+  relatedCollectionSlugs?: string[];
+  collectionIds?: string[];
   relatedGuideSlugs: string[];
-  tags?: string[];
-  /** Alias for backward compatibility */
-  summary?: string;
+  relatedGuideIds?: string[];
+  tags: string[];
 }

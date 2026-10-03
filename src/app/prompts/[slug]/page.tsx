@@ -11,8 +11,12 @@ import {
   getPromptBySlug,
   getRelatedPrompts,
 } from "@/lib/data/prompts";
+import { getCollectionsForPrompt } from "@/lib/data/collections";
+import { CollectionCard } from "@/components/collections/collection-card";
 import { getCategoryById } from "@/lib/data/categories";
 import { getModelById } from "@/lib/data/models";
+import { GuideCard } from "@/components/guides/guide-card";
+import { getGuidesForPrompt } from "@/lib/internal-links";
 import {
   ArrowLeft,
   ChevronRight,
@@ -26,6 +30,8 @@ import {
   SlidersHorizontal,
   Send,
   HelpCircle,
+  Workflow,
+  BookOpen,
 } from "lucide-react";
 
 import { constructMetadata, generatePromptJsonLd } from "@/lib/seo";
@@ -50,6 +56,7 @@ export async function generateMetadata({ params }: PromptPageProps): Promise<Met
     return {
       title: "Prompt Not Found",
       description: "The requested AI prompt could not be found.",
+      robots: { index: false, follow: false },
     };
   }
 
@@ -80,6 +87,8 @@ export default async function PromptDetailPage({ params }: PromptPageProps) {
 
   const category = getCategoryById(prompt.category);
   const relatedPrompts = getRelatedPrompts(prompt.id, 3);
+  const parentCollections = getCollectionsForPrompt(prompt.id);
+  const relatedGuides = getGuidesForPrompt(prompt.id, prompt.category, 2);
 
   const difficultyVariant =
     prompt.difficulty === "beginner"
@@ -529,6 +538,45 @@ export default async function PromptDetailPage({ params }: PromptPageProps) {
         </section>
 
         {/* ===================================================================== */}
+        {/* Curated Collections Featuring this Prompt                             */}
+        {/* ===================================================================== */}
+        {parentCollections.length > 0 && (
+          <section className="pt-10 mb-10 border-t border-[var(--border)] no-print">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Workflow className="h-4 w-4 text-[var(--primary)]" />
+                  <h2 className="text-xl font-bold tracking-tight text-[var(--foreground)]">
+                    Part of Curated Collections
+                  </h2>
+                </div>
+                <p className="text-xs text-[var(--muted-foreground)] mt-0.5">
+                  This prompt is sequenced as part of these goal-oriented workflows
+                </p>
+              </div>
+              <Link
+                href="/collections"
+                className="text-xs font-semibold text-[var(--primary)] hover:underline inline-flex items-center gap-1"
+              >
+                <span>View all collections</span>
+                <ChevronRight className="h-3 w-3" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {parentCollections.map((col) => (
+                <CollectionCard
+                  key={col.id}
+                  collection={col}
+                  compact
+                  sourcePage={`/prompts/${prompt.slug}`}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ===================================================================== */}
         {/* Related Prompts                                                       */}
         {/* ===================================================================== */}
         {relatedPrompts.length > 0 && (
@@ -554,6 +602,44 @@ export default async function PromptDetailPage({ params }: PromptPageProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedPrompts.map((rp) => (
                 <PromptCard key={rp.id} prompt={rp} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ===================================================================== */}
+        {/* Related Engineering Guides & Playbooks                                */}
+        {/* ===================================================================== */}
+        {relatedGuides.length > 0 && (
+          <section className="pt-10 border-t border-[var(--border)] no-print">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+              <div>
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-[var(--primary)]" />
+                  <h2 className="text-xl font-bold tracking-tight text-[var(--foreground)]">
+                    Related Engineering Guides
+                  </h2>
+                </div>
+                <p className="text-xs text-[var(--muted-foreground)] mt-0.5">
+                  Deep-dive playbooks and system prompt methodologies for {category?.name || "this category"}
+                </p>
+              </div>
+              <Link
+                href="/guides"
+                className="text-xs font-semibold text-[var(--primary)] hover:underline inline-flex items-center gap-1"
+              >
+                <span>View all guides</span>
+                <ChevronRight className="h-3 w-3" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {relatedGuides.map((guide) => (
+                <GuideCard
+                  key={guide.id}
+                  guide={guide}
+                  sourcePage={`/prompts/${prompt.slug}`}
+                />
               ))}
             </div>
           </section>

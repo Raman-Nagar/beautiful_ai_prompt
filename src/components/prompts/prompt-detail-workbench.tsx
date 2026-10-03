@@ -32,7 +32,7 @@ import {
   FileText,
   ExternalLink,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, copyToClipboard } from "@/lib/utils";
 
 interface PromptDetailWorkbenchProps {
   prompt: Prompt;
@@ -116,8 +116,8 @@ export function PromptDetailWorkbench({ prompt }: PromptDetailWorkbenchProps) {
 
   // Copy raw prompt template
   const handleCopyRaw = async () => {
-    try {
-      await navigator.clipboard.writeText(rawTemplate);
+    const ok = await copyToClipboard(rawTemplate);
+    if (ok) {
       showInlineFeedback("raw-copy", "Raw prompt copied to clipboard!");
 
       trackPromptCopy({
@@ -128,15 +128,15 @@ export function PromptDetailWorkbench({ prompt }: PromptDetailWorkbenchProps) {
         modelCompatibility: prompt.compatibleModels,
         variableCount: variables.length,
       });
-    } catch {
+    } else {
       showInlineFeedback("raw-copy", "Failed to copy prompt.", "info");
     }
   };
 
   // Copy customized prompt
   const handleCopyCustomized = async () => {
-    try {
-      await navigator.clipboard.writeText(customizedOutput);
+    const ok = await copyToClipboard(customizedOutput);
+    if (ok) {
       showInlineFeedback("custom-copy", "Customized prompt copied to clipboard!");
 
       const source = typeof window !== "undefined" ? window.location.pathname : `/prompts/${prompt.slug}`;
@@ -156,7 +156,7 @@ export function PromptDetailWorkbench({ prompt }: PromptDetailWorkbenchProps) {
         customizedFields: Object.keys(formValues),
         sourcePage: source,
       });
-    } catch {
+    } else {
       showInlineFeedback("custom-copy", "Failed to copy prompt.", "info");
     }
   };
@@ -196,10 +196,10 @@ export function PromptDetailWorkbench({ prompt }: PromptDetailWorkbenchProps) {
       }
     }
 
-    try {
-      await navigator.clipboard.writeText(shareUrl);
+    const ok = await copyToClipboard(shareUrl);
+    if (ok) {
       showInlineFeedback("share", "Page link copied to clipboard!");
-    } catch {
+    } else {
       showInlineFeedback("share", "Could not copy link.", "info");
     }
   };

@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "Terms of Service — Beautiful AI Prompt",
+  title: "Terms of Service",
   description:
     "Terms of Service for BeautifulAIPrompt.com. Permitted use, prompt rights, intellectual property guidelines, and conditions of service.",
   path: "/terms",

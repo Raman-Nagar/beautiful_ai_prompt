@@ -1,7 +1,9 @@
 import { PROMPTS } from "@/data/prompts";
 import { CATEGORIES } from "@/data/categories";
-import { Prompt, PromptFilterOptions, AIModelId } from "@/types";
+import { Prompt, PromptFilterOptions, AIModelId, PromptDifficulty } from "@/types";
 import { scorePrompt } from "@/lib/search";
+
+export { PROMPTS };
 
 // Category lookup map for fast resolution
 const categoryMap = new Map(CATEGORIES.map((c) => [c.slug, c.name]));
@@ -201,6 +203,52 @@ export function getFeaturedPrompts(limit?: number): Prompt[] {
 export function getTrendingPrompts(limit?: number): Prompt[] {
   const trending = PROMPTS.filter((p) => p.trending).map(normalizePrompt);
   return typeof limit === "number" ? trending.slice(0, limit) : trending;
+}
+
+/**
+ * Retrieves the most recently published prompts
+ */
+export function getLatestPrompts(limit: number = 6): Prompt[] {
+  const sorted = [...PROMPTS].sort((a, b) => {
+    const timeA = new Date(a.createdAt).getTime();
+    const timeB = new Date(b.createdAt).getTime();
+    return timeB - timeA;
+  });
+  return sorted.slice(0, limit).map(normalizePrompt);
+}
+
+/**
+ * Returns the total count of prompts in the repository
+ */
+export function getPromptCount(): number {
+  return PROMPTS.length;
+}
+
+/**
+ * Retrieves prompts belonging to a specific subcategory within a category
+ */
+export function getPromptsBySubcategory(categorySlug: string, subcategory: string): Prompt[] {
+  const cat = categorySlug.toLowerCase().trim();
+  const sub = subcategory.toLowerCase().trim();
+  return PROMPTS.filter(
+    (p) => p.category.toLowerCase() === cat && p.subcategory?.toLowerCase() === sub
+  ).map(normalizePrompt);
+}
+
+/**
+ * Retrieves prompts by difficulty tier
+ */
+export function getPromptsByDifficulty(difficulty: PromptDifficulty): Prompt[] {
+  return PROMPTS.filter((p) => p.difficulty === difficulty).map(normalizePrompt);
+}
+
+/**
+ * Returns a random selection of prompts for discovery or empty states
+ */
+export function getRandomPrompts(count: number = 3, excludeId?: string): Prompt[] {
+  const eligible = excludeId ? PROMPTS.filter((p) => p.id !== excludeId) : PROMPTS;
+  const shuffled = [...eligible].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count).map(normalizePrompt);
 }
 
 /**

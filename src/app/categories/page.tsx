@@ -11,7 +11,7 @@ import { TrackedCategoryLink } from "@/components/analytics/tracked-link";
 import { constructMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = constructMetadata({
-  title: "Categories",
+  title: "All Categories",
   description:
     "Browse over 20 specialized categories of practical, battle-tested AI prompts for engineering, marketing, business, and productivity.",
   path: "/categories",

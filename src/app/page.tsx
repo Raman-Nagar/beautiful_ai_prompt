@@ -308,7 +308,7 @@ export default function Home() {
                     </h3>
 
                     <p className="text-xs sm:text-sm text-[var(--muted-foreground)] mt-2 leading-relaxed">
-                      {col.description}
+                      {col.shortDescription || col.description}
                     </p>
 
                     {col.tags && col.tags.length > 0 && (

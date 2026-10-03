@@ -63,6 +63,17 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE_URL,
   },
+  icons: {
+    icon: "/favicon.ico",
+  },
+  verification:
+    process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || process.env.GOOGLE_SITE_VERIFICATION
+      ? {
+          google:
+            process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
+            process.env.GOOGLE_SITE_VERIFICATION,
+        }
+      : undefined,
   robots: {
     index: true,
     follow: true,

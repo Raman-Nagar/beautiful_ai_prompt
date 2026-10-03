@@ -27,8 +27,8 @@ export function Footer() {
   ];
 
   const companyLinks = [
-    { label: "About Beautiful AI", href: "/about" },
-    { label: "Contact Us", href: "/contact" },
+    { label: "About Beautiful AI Prompt", href: "/about" },
+    { label: "Contact & Feedback", href: "/contact" },
   ];
 
   const legalLinks = [
@@ -72,29 +72,20 @@ export function Footer() {
               </span>
             </div>
 
-            {/* Social placeholders */}
-            <div className="pt-1 space-y-2">
+            {/* Community & Contributions */}
+            <div className="pt-1 space-y-1.5">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--subtle-foreground)]">
-                Community &amp; Updates
+                Community &amp; Contributions
               </p>
-              <div className="flex items-center gap-2">
-                {[
-                  { code: "𝕏", label: "Follow on X (coming soon)" },
-                  { code: "GH", label: "Star on GitHub (coming soon)" },
-                  { code: "DC", label: "Join Discord (coming soon)" },
-                  { code: "in", label: "LinkedIn (coming soon)" },
-                ].map((s) => (
-                  <div
-                    key={s.code}
-                    role="img"
-                    aria-label={s.label}
-                    title={s.label}
-                    className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--card)] text-[11px] font-mono font-medium text-[var(--subtle-foreground)] hover:border-[var(--border-strong)] hover:text-[var(--muted-foreground)] transition-colors cursor-default select-none"
-                  >
-                    {s.code}
-                  </div>
-                ))}
-              </div>
+              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                Have a proven prompt or suggestion?{" "}
+                <Link
+                  href="/contact"
+                  className="font-medium text-[var(--primary)] hover:underline inline-flex items-center gap-0.5"
+                >
+                  Submit a prompt &rarr;
+                </Link>
+              </p>
             </div>
           </div>
 

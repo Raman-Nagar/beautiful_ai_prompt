@@ -1,0 +1,195 @@
+// Beautiful AI Prompt - Production Prisma Schema Preview
+// Phase 2 Database Architecture: Next.js Frontend -> NestJS API -> Prisma -> PostgreSQL
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum PromptDifficulty {
+  beginner
+  intermediate
+  advanced
+}
+
+enum VariableType {
+  text
+  textarea
+  select
+}
+
+enum ModelId {
+  claude
+  chatgpt
+  gemini
+  deepseek
+  copilot
+  mistral
+  llama
+  grok
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  name        String
+  description String
+  icon        String
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  prompts     Prompt[]
+  collections CollectionCategory[]
+
+  @@index([slug])
+  @@index([featured])
+  @@map("categories")
+}
+
+model Prompt {
+  id               String           @id @default(uuid())
+  slug             String           @unique
+  title            String
+  shortDescription String
+  description      String           @db.Text
+  prompt           String           @db.Text
+  subcategory      String?
+  tags             String[]
+  useCases         String[]
+  difficulty       PromptDifficulty @default(intermediate)
+  compatibleModels ModelId[]
+  exampleInput     String?          @db.Text
+  exampleOutput    String?          @db.Text
+  featured         Boolean          @default(false)
+  trending         Boolean          @default(false)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  // Category relation
+  categoryId       String
+  category         Category         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  // Variables relation
+  variables        PromptVariable[]
+
+  // Collections relation (Many-to-Many)
+  collectionItems  CollectionPromptItem[]
+
+  // Self-referencing related prompts (Many-to-Many via join table)
+  relatedFrom      RelatedPrompt[]  @relation("PromptToRelated")
+  relatedTo        RelatedPrompt[]  @relation("RelatedToPrompt")
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([featured, trending])
+  @@index([difficulty])
+  @@index([createdAt(sort: Desc)])
+  @@map("prompts")
+}
+
+model PromptVariable {
+  id           String       @id @default(uuid())
+  promptId     String
+  name         String       // Token name used in prompt template e.g. "target_role"
+  label        String       // Display label in UI workbench
+  description  String?
+  placeholder  String?
+  required     Boolean      @default(true)
+  type         VariableType @default(text)
+  options      String[]     // Non-empty for type="select"
+  defaultValue String?
+  order        Int          @default(0)
+
+  prompt       Prompt       @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@unique([promptId, name])
+  @@index([promptId])
+  @@map("prompt_variables")
+}
+
+model RelatedPrompt {
+  promptId        String
+  relatedPromptId String
+
+  prompt          Prompt @relation("PromptToRelated", fields: [promptId], references: [id], onDelete: Cascade)
+  relatedPrompt   Prompt @relation("RelatedToPrompt", fields: [relatedPromptId], references: [id], onDelete: Cascade)
+
+  @@id([promptId, relatedPromptId])
+  @@map("related_prompts")
+}
+
+model Collection {
+  id                     String                 @id @default(uuid())
+  slug                   String                 @unique
+  title                  String
+  description            String
+  editorialOverview      String                 @db.Text
+  featured               Boolean                @default(false)
+  targetAudience         String
+  tags                   String[]
+  curatorNotes           String?                @db.Text
+  keyTakeaways           String[]
+  relatedCollectionSlugs String[]
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+
+  categories             CollectionCategory[]
+  prompts                CollectionPromptItem[]
+
+  @@index([slug])
+  @@index([featured])
+  @@map("collections")
+}
+
+model CollectionCategory {
+  collectionId String
+  categoryId   String
+
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  category     Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, categoryId])
+  @@map("collection_categories")
+}
+
+model CollectionPromptItem {
+  collectionId String
+  promptId     String
+  order        Int        @default(0)
+
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  prompt       Prompt     @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, promptId])
+  @@index([collectionId, order])
+  @@map("collection_prompt_items")
+}
+
+model Guide {
+  id                 String   @id @default(uuid())
+  slug               String   @unique
+  title              String
+  description        String
+  readTime           String
+  category           String
+  difficulty         String
+  author             String
+  authorRole         String
+  featured           Boolean  @default(false)
+  order              Int      @default(0)
+  sections           Json     // Structured guide sections: heading, content, promptIds
+  keyTakeaways       String[]
+  relatedGuideSlugs  String[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([slug])
+  @@index([featured])
+  @@map("guides")
+}

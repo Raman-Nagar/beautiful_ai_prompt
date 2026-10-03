@@ -1,6 +1,10 @@
 import { Prompt } from "@/types/prompt";
+import { PROMPTS_BATCH_1 } from "./prompts-batch-1";
+import { PROMPTS_BATCH_2 } from "./prompts-batch-2";
+import { PROMPTS_BATCH_3 } from "./prompts-batch-3";
+import { PROMPTS_BATCH_4 } from "./prompts-batch-4";
 
-export const PROMPTS: Prompt[] = [
+const INITIAL_PROMPTS: Prompt[] = [
   // 1. Career
   {
     id: "prompt-001",
@@ -1658,4 +1662,12 @@ export const PROMPTS: Prompt[] = [
     updatedAt: "2026-03-28T00:00:00Z",
     categoryName: "Career",
   },
+];
+
+export const PROMPTS: Prompt[] = [
+  ...INITIAL_PROMPTS,
+  ...PROMPTS_BATCH_1,
+  ...PROMPTS_BATCH_2,
+  ...PROMPTS_BATCH_3,
+  ...PROMPTS_BATCH_4,
 ];

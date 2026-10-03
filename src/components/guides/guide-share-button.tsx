@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Share2, Check } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
+import { copyToClipboard } from "@/lib/utils";
 
 interface GuideShareButtonProps {
   title: string;
@@ -33,10 +34,12 @@ export function GuideShareButton({ title, className }: GuideShareButtonProps) {
       }
     }
 
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    success("Guide link copied to clipboard!");
-    setTimeout(() => setCopied(false), 2000);
+    const ok = await copyToClipboard(url);
+    if (ok) {
+      setCopied(true);
+      success("Guide link copied to clipboard!");
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (

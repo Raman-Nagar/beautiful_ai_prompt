@@ -25,7 +25,7 @@ import {
   Trash2,
   FileText,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, copyToClipboard } from "@/lib/utils";
 import { trackSearch, trackPromptCopy } from "@/lib/analytics";
 
 interface SearchCommandDialogProps {
@@ -183,11 +183,14 @@ export function SearchCommandDialog({
   }, [activeIndex]);
 
   // Quick copy prompt action with non-intrusive inline feedback
-  const handleCopy = (e: React.MouseEvent, p: Prompt) => {
+  const handleCopy = async (e: React.MouseEvent, p: Prompt) => {
     e.stopPropagation();
     const textToCopy = p.prompt || p.template || "";
-    navigator.clipboard.writeText(textToCopy);
-    setCopiedId(p.id);
+    const ok = await copyToClipboard(textToCopy);
+    if (ok) {
+      setCopiedId(p.id);
+      setTimeout(() => setCopiedId(null), 1800);
+    }
 
     trackPromptCopy({
       promptId: p.id,
@@ -197,8 +200,6 @@ export function SearchCommandDialog({
       modelCompatibility: p.compatibleModels,
       variableCount: p.variables?.length || 0,
     });
-
-    setTimeout(() => setCopiedId(null), 1800);
   };
 
   if (!isOpen) return null;

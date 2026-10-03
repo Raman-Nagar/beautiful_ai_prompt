@@ -36,10 +36,18 @@ export function getSavedPromptIds(): string[] {
     const raw = localStorage.getItem(SAVED_PROMPTS_KEY);
     if (raw !== lastSavedRaw) {
       lastSavedRaw = raw;
-      savedCache = raw ? JSON.parse(raw) : EMPTY_SAVED_IDS;
+      if (!raw) {
+        savedCache = EMPTY_SAVED_IDS;
+      } else {
+        const parsed = JSON.parse(raw);
+        savedCache = Array.isArray(parsed)
+          ? parsed.filter((item): item is string => typeof item === "string")
+          : EMPTY_SAVED_IDS;
+      }
     }
     return savedCache;
   } catch {
+    savedCache = EMPTY_SAVED_IDS;
     return savedCache;
   }
 }
@@ -58,11 +66,17 @@ export function toggleSavedPromptId(id: string): boolean {
     isNowSaved = true;
   }
 
-  const serialized = JSON.stringify(updated);
-  localStorage.setItem(SAVED_PROMPTS_KEY, serialized);
-  lastSavedRaw = serialized;
-  savedCache = updated;
-  notify();
+  try {
+    const serialized = JSON.stringify(updated);
+    localStorage.setItem(SAVED_PROMPTS_KEY, serialized);
+    lastSavedRaw = serialized;
+    savedCache = updated;
+    notify();
+  } catch {
+    // Gracefully handle storage quota or private browsing exceptions
+    savedCache = updated;
+    notify();
+  }
   return isNowSaved;
 }
 
@@ -90,9 +104,14 @@ export function getStoredTheme(): "dark" | "light" | "system" {
 
 export function setStoredTheme(theme: "dark" | "light" | "system") {
   if (typeof window === "undefined") return;
-  localStorage.setItem(THEME_KEY, theme);
-  themeCache = theme;
-  notify();
+  try {
+    localStorage.setItem(THEME_KEY, theme);
+    themeCache = theme;
+    notify();
+  } catch {
+    themeCache = theme;
+    notify();
+  }
 }
 
 export function useStoredTheme(): "dark" | "light" | "system" {

@@ -4,8 +4,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { PromptCard } from "@/components/prompts/prompt-card";
+import { CollectionCard } from "@/components/collections/collection-card";
+import { GuideCard } from "@/components/guides/guide-card";
 import { GuideTableOfContents } from "@/components/guides/guide-toc";
 import { CodeBlock } from "@/components/guides/code-block";
 import { GuideInlinePrompt } from "@/components/guides/guide-inline-prompt";
@@ -14,6 +15,7 @@ import {
   getAllGuides,
   getGuideBySlug,
   getGuidePrompts,
+  getGuideCollections,
   getRelatedGuides,
 } from "@/lib/data/guides";
 import {
@@ -27,12 +29,14 @@ import {
   Info,
   Lightbulb,
   Layers,
-  User,
   ShieldCheck,
+  FolderGit2,
+  BookOpen,
 } from "lucide-react";
 
 import { constructMetadata, generateGuideJsonLd } from "@/lib/seo";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { getCategoryForGuide } from "@/lib/internal-links";
 
 interface GuidePageProps {
   params: Promise<{ slug: string }>;
@@ -53,12 +57,13 @@ export async function generateMetadata({ params }: GuidePageProps): Promise<Meta
     return {
       title: "Guide Not Found",
       description: "The requested prompt engineering guide could not be found.",
+      robots: { index: false, follow: false },
     };
   }
 
   return constructMetadata({
     title: guide.title,
-    description: guide.description,
+    description: guide.description || guide.excerpt,
     path: `/guides/${guide.slug}`,
     keywords: [
       ...(guide.tags || []),
@@ -70,7 +75,7 @@ export async function generateMetadata({ params }: GuidePageProps): Promise<Meta
     type: "article",
     publishedTime: guide.publishedAt,
     modifiedTime: guide.updatedAt || guide.publishedAt,
-    authors: [guide.author.name],
+    authors: guide.author ? [guide.author.name] : ["Beautiful AI Prompt Editorial Team"],
   });
 }
 
@@ -82,8 +87,10 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
     notFound();
   }
 
+  const primaryCategory = getCategoryForGuide(guide);
   const relatedPrompts = getGuidePrompts(guide);
-  const relatedGuides = getRelatedGuides(guide.slug, 2);
+  const relatedCollections = getGuideCollections(guide);
+  const relatedGuides = getRelatedGuides(guide.slug, 3);
 
   // Truthful JSON-LD Schema (TechArticle) without any fake ratings or social proof
   const jsonLd = generateGuideJsonLd(guide);
@@ -101,7 +108,9 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
         items={[
           { label: "Home", href: "/" },
           { label: "Guides", href: "/guides" },
-          { label: guide.category },
+          ...(primaryCategory
+            ? [{ label: primaryCategory.name, href: `/categories/${primaryCategory.slug}` }]
+            : []),
           { label: guide.title },
         ]}
       />
@@ -134,26 +143,26 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
 
             {/* Subtitle / Lead Paragraph */}
             <p className="text-base sm:text-lg text-[var(--subtle-foreground)] leading-relaxed font-normal">
-              {guide.description}
+              {guide.excerpt || guide.description}
             </p>
 
-            {/* Author and Publishing Details */}
+            {/* Publishing Details & Share */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-[var(--border-subtle)] text-xs">
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-full bg-[var(--primary)]/10 border border-[var(--primary)]/20 flex items-center justify-center text-[var(--primary)] font-semibold shrink-0">
-                  <User className="h-4 w-4" />
+                  <BookOpen className="h-4 w-4" />
                 </div>
                 <div>
                   <div className="font-semibold text-[var(--foreground)]">
-                    {guide.author.name}
+                    {guide.author?.name || "Beautiful AI Prompt Editorial Team"}
                   </div>
                   <div className="text-[var(--muted-foreground)] flex items-center gap-2 text-[11px]">
-                    <span>{guide.author.role}</span>
+                    <span>{guide.author?.role || "Curator & Research"}</span>
                     <span>•</span>
                     <span className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      Published{" "}
-                      {new Date(guide.publishedAt).toLocaleDateString("en-US", {
+                      Updated{" "}
+                      {new Date(guide.updatedAt || guide.publishedAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
@@ -167,6 +176,21 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
                 <GuideShareButton title={guide.title} />
               </div>
             </div>
+
+            {/* Tags Row */}
+            {guide.tags && guide.tags.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 pt-2">
+                <span className="text-[11px] font-semibold text-[var(--muted-foreground)]">Topics:</span>
+                {guide.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-[var(--radius-sm)] bg-[var(--secondary)] px-2.5 py-0.5 text-xs text-[var(--muted-foreground)] border border-[var(--border-subtle)]"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </Container>
       </div>
@@ -175,7 +199,7 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
       <Container className="py-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Main Article Body (8 cols) */}
-          <main className="lg:col-span-8 space-y-12">
+          <article className="lg:col-span-8 space-y-12">
             {/* Mobile Table of Contents */}
             <GuideTableOfContents
               items={guide.tableOfContents}
@@ -225,10 +249,10 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
                     <div>
                       <div className="font-semibold text-xs uppercase tracking-wider mb-1 text-[var(--muted-foreground)]">
                         {section.callout.type === "tip"
-                          ? "Pro Tip"
+                          ? "Practitioner Tip"
                           : section.callout.type === "warning"
-                          ? "Caution"
-                          : "Key Takeaway"}
+                          ? "Common Mistake"
+                          : "Key Principle"}
                       </div>
                       <p className="leading-relaxed text-xs sm:text-sm">
                         {section.callout.text}
@@ -257,13 +281,15 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
             <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card)] p-6 my-10 space-y-3">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--primary)]">
                 <CheckCircle2 className="h-4 w-4" />
-                <span>Playbook Summary</span>
+                <span>Playbook Summary &amp; Action Plan</span>
               </div>
               <p className="text-sm text-[var(--subtle-foreground)] leading-relaxed">
-                Applying these constraints systematically converts generative AI from an unpredictable conversationalist into a reliable, deterministic copilot. Combine these structural foundations with the ready-to-use production prompt templates below.
+                {guide.excerpt
+                  ? `${guide.excerpt} Apply these frameworks using the production-ready prompt templates below.`
+                  : "Apply these structural frameworks with the ready-to-use production prompt templates below to get consistent, high-quality results from any AI model."}
               </p>
             </div>
-          </main>
+          </article>
 
           {/* Sticky Editorial Sidebar (4 cols) */}
           <aside className="lg:col-span-4 space-y-6">
@@ -283,7 +309,7 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
                 <ul className="space-y-2 text-xs text-[var(--subtle-foreground)]">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-3.5 w-3.5 text-[var(--status-success)] shrink-0 mt-0.5" />
-                    <span>Tested across GPT-4o, Claude 3.5 Sonnet & Gemini 1.5 Pro</span>
+                    <span>Tested across GPT-4o, Claude 3.7 Sonnet &amp; Gemini 1.5 Pro</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-3.5 w-3.5 text-[var(--status-success)] shrink-0 mt-0.5" />
@@ -332,9 +358,9 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
                   <Sparkles className="h-3 w-3" />
                   Interactive Prompts
                 </Badge>
-                <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
                   Prompts Mentioned in this Guide
-                </h3>
+                </h2>
                 <p className="text-xs sm:text-sm text-[var(--muted-foreground)] mt-1">
                   Ready to copy, customize with variables, or inspect in our prompt playground.
                 </p>
@@ -344,7 +370,7 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
                 href="/prompts"
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--primary)] hover:underline shrink-0"
               >
-                <span>Browse All 25+ Prompts</span>
+                <span>Browse All Prompts</span>
                 <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
@@ -357,6 +383,40 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
           </div>
         )}
 
+        {/* Section: Related Collections */}
+        {relatedCollections.length > 0 && (
+          <div className="mt-16 pt-12 border-t border-[var(--border)]">
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div>
+                <Badge variant="secondary" size="sm" className="mb-2 gap-1">
+                  <FolderGit2 className="h-3 w-3" />
+                  Curated Workflows
+                </Badge>
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+                  Related Prompt Collections
+                </h2>
+                <p className="text-xs sm:text-sm text-[var(--muted-foreground)] mt-1">
+                  Multi-step prompt stacks designed to help you execute complete workflows from end to end.
+                </p>
+              </div>
+
+              <Link
+                href="/collections"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--primary)] hover:underline shrink-0"
+              >
+                <span>Browse All 22 Collections</span>
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {relatedCollections.map((col) => (
+                <CollectionCard key={col.id} collection={col} compact />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Section: Related Guides */}
         {relatedGuides.length > 0 && (
           <div className="mt-16 pt-12 border-t border-[var(--border)]">
@@ -364,58 +424,24 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
               <Badge variant="secondary" size="sm" className="mb-2">
                 Continue Learning
               </Badge>
-              <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
                 Related Engineering Guides
-              </h3>
+              </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedGuides.map((relGuide) => (
-                <Link
-                  key={relGuide.id}
-                  href={`/guides/${relGuide.slug}`}
-                  className="group block focus:outline-none"
-                >
-                  <Card
-                    hoverable
-                    className="p-6 h-full flex flex-col justify-between border-[var(--border)] hover:border-[var(--border-strong)] transition-all"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between pb-3 mb-2 border-b border-[var(--border-subtle)] text-xs">
-                        <Badge variant="secondary" size="sm">
-                          {relGuide.category}
-                        </Badge>
-                        <span className="flex items-center gap-1 text-[11px] text-[var(--muted-foreground)] font-mono">
-                          <Clock className="h-3 w-3" />
-                          {relGuide.readingTime}
-                        </span>
-                      </div>
-
-                      <h4 className="text-base font-bold tracking-tight text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors leading-snug">
-                        {relGuide.title}
-                      </h4>
-
-                      <p className="text-xs text-[var(--muted-foreground)] mt-2 line-clamp-2 leading-relaxed">
-                        {relGuide.description}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs font-semibold text-[var(--primary)]">
-                      <span>Read Guide</span>
-                      <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
-                    </div>
-                  </Card>
-                </Link>
+                <GuideCard key={relGuide.id} guide={relGuide} />
               ))}
             </div>
           </div>
         )}
 
         {/* Bottom Back Button */}
-        <div className="mt-12 text-center">
+        <div className="mt-16 text-center">
           <Link
             href="/guides"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--card)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--secondary)] transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--card)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--secondary)] transition-colors shadow-xs"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Return to All Guides</span>

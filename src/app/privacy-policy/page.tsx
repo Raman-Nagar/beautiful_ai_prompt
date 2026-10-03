@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "Privacy Policy — Beautiful AI Prompt",
+  title: "Privacy Policy",
   description:
     "Privacy Policy for BeautifulAIPrompt.com. Transparent, local-first data practices, zero account requirements, and safe prompt customization.",
   path: "/privacy-policy",

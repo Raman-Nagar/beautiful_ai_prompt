@@ -1,42 +1,37 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { getAllGuides, getFeaturedGuides } from "@/lib/data/guides";
+import { GuidesExplorer } from "@/components/guides/guides-explorer";
 import {
-  BookOpen,
-  ArrowRight,
   Sparkles,
-  Clock,
-  Calendar,
   Layers,
   CheckCircle2,
+  Workflow,
+  Cpu,
 } from "lucide-react";
-import { TrackedGuideLink } from "@/components/analytics/tracked-link";
-
 import { constructMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = constructMetadata({
-  title: "Prompt Engineering & AI Guides",
+  title: "AI Prompt Engineering & Practitioner Guides",
   description:
-    "Empirical prompt engineering frameworks, technical playbooks, and tactical guides to help you get 10x higher-signal results from ChatGPT, Claude, and Gemini.",
+    "Comprehensive, practical guides for AI prompt engineering, software development, resume writing, interview preparation, marketing, productivity, and research.",
   path: "/guides",
   keywords: [
     "prompt engineering guides",
-    "how to write prompts",
-    "ChatGPT prompting tips",
-    "developer AI prompts",
-    "resume AI prompts",
-    "interview AI prompts",
-    "YouTube AI prompts",
+    "how to write AI prompts",
+    "ChatGPT prompting tutorial",
+    "software developer AI prompts",
+    "resume writing AI",
+    "job interview preparation AI",
+    "productivity AI prompts",
+    "research with AI",
   ],
 });
 
 export default function GuidesPage() {
   const allGuides = getAllGuides();
   const featuredGuides = getFeaturedGuides();
-  const primaryFeatured = featuredGuides[0] || allGuides[0];
-  const remainingGuides = allGuides.filter((g) => g.id !== primaryFeatured?.id);
 
   return (
     <div className="min-h-screen bg-[var(--background)] py-12 sm:py-16">
@@ -46,7 +41,7 @@ export default function GuidesPage() {
           <div className="inline-flex items-center gap-2">
             <Badge variant="primary" size="sm">
               <Sparkles className="h-3 w-3 mr-1" />
-              Prompt Engineering Playbook
+              Educational Knowledge Base
             </Badge>
             <span className="text-xs text-[var(--muted-foreground)]">
               {allGuides.length} In-Depth Engineering Guides
@@ -54,11 +49,11 @@ export default function GuidesPage() {
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[var(--foreground)]">
-            Prompt Engineering & AI Guides
+            AI Prompting &amp; Practitioner Guides
           </h1>
 
-          <p className="text-base text-[var(--subtle-foreground)] leading-relaxed">
-            Practical frameworks, system prompt architectures, and empirical guides to help you
+          <p className="text-base sm:text-lg text-[var(--subtle-foreground)] leading-relaxed">
+            Practical playbooks, system prompt architectures, and tactical guides to help you
             extract high-fidelity reasoning, clean code, and structured outputs from modern generative
             AI models.
           </p>
@@ -70,125 +65,75 @@ export default function GuidesPage() {
             </span>
             <span className="flex items-center gap-1.5">
               <Layers className="h-3.5 w-3.5 text-[var(--primary)]" />
-              Linked to Production Prompts
+              Linked to Verified Prompts
             </span>
             <span className="flex items-center gap-1.5">
-              <BookOpen className="h-3.5 w-3.5 text-[var(--primary)]" />
-              Zero Fluff or Generic Advice
+              <Workflow className="h-3.5 w-3.5 text-[var(--primary)]" />
+              Step-by-Step Workflows
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Cpu className="h-3.5 w-3.5 text-[var(--primary)]" />
+              Zero Fluff or Generic Filler
             </span>
           </div>
         </div>
 
-        {/* Primary Featured Guide Hero Card */}
-        {primaryFeatured && (
-          <div className="mb-12">
-            <TrackedGuideLink
-              guideSlug={primaryFeatured.slug}
-              guideTitle={primaryFeatured.title}
-              sourcePage="/guides"
-              href={`/guides/${primaryFeatured.slug}`}
-              className="group block focus:outline-none"
-            >
-              <div className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-gradient-to-br from-[var(--card)] via-[var(--card)] to-[var(--secondary)]/40 p-6 sm:p-10 shadow-md card-lift relative overflow-hidden">
-                <div className="flex flex-wrap items-center gap-2 mb-4">
-                  <Badge variant="warning" size="sm" className="gap-1">
-                    <Sparkles className="h-3 w-3" />
-                    Featured Guide
-                  </Badge>
-                  <Badge variant="primary" size="sm">
-                    {primaryFeatured.category}
-                  </Badge>
-                  <span className="flex items-center gap-1 text-xs text-[var(--muted-foreground)] font-mono ml-auto">
-                    <Clock className="h-3 w-3" />
-                    {primaryFeatured.readingTime}
-                  </span>
-                </div>
+        {/* Guides Explorer with Featured Section, Search, and Topic Filters */}
+        <GuidesExplorer
+          guides={allGuides}
+          featuredGuides={featuredGuides}
+        />
 
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors leading-tight mb-3">
-                  {primaryFeatured.title}
-                </h2>
-
-                <p className="text-sm sm:text-base text-[var(--subtle-foreground)] leading-relaxed max-w-3xl mb-6">
-                  {primaryFeatured.description}
-                </p>
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-[var(--border-subtle)] text-xs">
-                  <div className="flex items-center gap-2 text-[var(--muted-foreground)]">
-                    <span className="font-medium text-[var(--foreground)]">
-                      {primaryFeatured.author.name}
-                    </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(primaryFeatured.publishedAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </div>
-
-                  <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary)] group-hover:underline">
-                    <span>Read Complete Guide</span>
-                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </div>
-              </div>
-            </TrackedGuideLink>
+        {/* Educational Standards Methodology Section */}
+        <section className="mt-20 rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--card)] p-8 sm:p-10 shadow-xs">
+          <div className="max-w-2xl space-y-3 mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+              The Beautiful AI Prompt Educational Standard
+            </h2>
+            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+              We reject generic SEO blog content, ungrounded advice, and hallucinated case studies.
+              Every guide on our platform adheres to strict editorial principles.
+            </p>
           </div>
-        )}
 
-        {/* Guides Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {remainingGuides.map((guide) => (
-            <TrackedGuideLink
-              key={guide.id}
-              guideSlug={guide.slug}
-              guideTitle={guide.title}
-              sourcePage="/guides"
-              href={`/guides/${guide.slug}`}
-              className="group block focus:outline-none"
-            >
-              <Card
-                className="h-full flex flex-col justify-between p-6 card-lift cursor-pointer hover:bg-[var(--card-hover)]"
-              >
-                <div>
-                  <div className="flex items-center justify-between pb-3 mb-2 border-b border-[var(--border-subtle)]">
-                    <Badge variant="secondary" size="sm">
-                      {guide.category}
-                    </Badge>
-                    <span className="flex items-center gap-1 text-[11px] text-[var(--muted-foreground)] font-mono">
-                      <Clock className="h-3 w-3" />
-                      {guide.readingTime}
-                    </span>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-[var(--subtle-foreground)]">
+            <div className="space-y-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--primary-muted)] text-[var(--primary)] font-mono font-bold">
+                01
+              </span>
+              <h3 className="font-semibold text-[var(--foreground)] text-sm">
+                Empirical Rigor
+              </h3>
+              <p className="leading-relaxed">
+                Tested against GPT-4o, Claude 3.7 Sonnet, and Gemini 1.5 Pro to ensure consistent behavior across reasoning models.
+              </p>
+            </div>
 
-                  <h3 className="text-base font-bold tracking-tight text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors mt-2 leading-snug">
-                    {guide.title}
-                  </h3>
+            <div className="space-y-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--primary-muted)] text-[var(--primary)] font-mono font-bold">
+                02
+              </span>
+              <h3 className="font-semibold text-[var(--foreground)] text-sm">
+                Production-Linked
+              </h3>
+              <p className="leading-relaxed">
+                Every guide connects directly to ready-to-use production prompt templates and curated workflow collections in our library.
+              </p>
+            </div>
 
-                  <p className="text-xs leading-relaxed text-[var(--muted-foreground)] mt-2 line-clamp-3">
-                    {guide.description}
-                  </p>
-                </div>
-
-                <div className="mt-6 flex items-center justify-between border-t border-[var(--border-subtle)] pt-4 text-xs font-semibold text-[var(--primary)]">
-                  <span className="text-[11px] text-[var(--muted-foreground)] font-normal">
-                    {new Date(guide.publishedAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <span>Read Guide</span>
-                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </div>
-              </Card>
-            </TrackedGuideLink>
-          ))}
-        </div>
+            <div className="space-y-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--primary-muted)] text-[var(--primary)] font-mono font-bold">
+                03
+              </span>
+              <h3 className="font-semibold text-[var(--foreground)] text-sm">
+                No Fake Credentials
+              </h3>
+              <p className="leading-relaxed">
+                Authored and reviewed by our internal editorial team without fabricated author personas, artificial ratings, or spammy keyword stuffing.
+              </p>
+            </div>
+          </div>
+        </section>
       </Container>
     </div>
   );

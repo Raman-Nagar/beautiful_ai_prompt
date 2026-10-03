@@ -2,6 +2,8 @@ import { CATEGORIES } from "@/data/categories";
 import { PROMPTS } from "@/data/prompts";
 import { Category } from "@/types/category";
 
+export { CATEGORIES };
+
 /**
  * Returns all categories with live prompt count computed from dataset
  */
@@ -86,6 +88,12 @@ const DOMAIN_CLUSTERS: Record<string, string[]> = {
   research: ["education", "students", "coding", "business"],
   freelancing: ["business", "sales", "coding", "career"],
   "customer-support": ["email", "sales", "productivity", "business"],
+  "ai-development": ["coding", "javascript", "react", "nextjs"],
+  design: ["coding", "react", "marketing", "content-creation"],
+  ecommerce: ["marketing", "sales", "business", "customer-support"],
+  hr: ["career", "job-interview", "business", "operations"],
+  finance: ["business", "operations", "productivity", "freelancing"],
+  operations: ["productivity", "business", "hr", "finance"],
 };
 
 /**

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "AI Output & Content Disclaimer — Beautiful AI Prompt",
+  title: "AI Output & Content Disclaimer",
   description:
     "Essential guidance on using AI prompts safely. Clarifies that prompts are tools, outputs may be inaccurate, and critical information must always be verified.",
   path: "/disclaimer",

@@ -22,6 +22,11 @@ import {
   Headphones,
   Palette,
   Sparkles,
+  ShoppingBag,
+  Users,
+  DollarSign,
+  Workflow,
+  Cpu,
   LucideIcon,
 } from "lucide-react";
 
@@ -53,6 +58,11 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Headphones,
   Palette,
   Sparkles,
+  ShoppingBag,
+  Users,
+  DollarSign,
+  Workflow,
+  Cpu,
 };
 
 export function CategoryIcon({ name, className = "h-5 w-5" }: CategoryIconProps) {
