@@ -8,6 +8,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { PageViewTracker } from "@/components/analytics/page-view-tracker";
 import { MicrosoftClarity } from "@/components/analytics/clarity";
+import { GoogleTagManager, GoogleTagManagerNoscript } from "@/components/analytics/gtm";
 import {
   SITE_URL,
   SITE_NAME,
@@ -144,6 +145,7 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-screen flex-col bg-[var(--background)] text-[var(--foreground)] selection:bg-[var(--primary-muted)] selection:text-[var(--primary)]">
+        <GoogleTagManagerNoscript />
         {/* Accessible skip link */}
         <a
           href="#main-content"
@@ -156,6 +158,7 @@ export default function RootLayout({
             <SearchProvider>
               <PageViewTracker />
               <MicrosoftClarity />
+              <GoogleTagManager />
               <Navbar />
               <main id="main-content" className="flex-1">
                 {children}
