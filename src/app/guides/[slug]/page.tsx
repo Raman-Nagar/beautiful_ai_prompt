@@ -34,7 +34,7 @@ import {
   BookOpen,
 } from "lucide-react";
 
-import { constructMetadata, generateGuideJsonLd } from "@/lib/seo";
+import { constructMetadata, generateGuideJsonLd, getDynamicOgImageUrl } from "@/lib/seo";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { getCategoryForGuide } from "@/lib/internal-links";
 
@@ -61,10 +61,22 @@ export async function generateMetadata({ params }: GuidePageProps): Promise<Meta
     };
   }
 
+  const authorName = guide.author?.name || "Editorial Team";
+  const ogImageUrl = getDynamicOgImageUrl({
+    title: guide.title,
+    type: "Engineering Guide",
+    category: guide.category,
+    meta: `By ${authorName} • ${guide.readingTime} min read • Verified Guide`,
+  });
+
   return constructMetadata({
     title: guide.title,
     description: guide.description || guide.excerpt,
     path: `/guides/${guide.slug}`,
+    image: {
+      url: ogImageUrl,
+      alt: `${guide.title} - Engineering Guide`,
+    },
     keywords: [
       ...(guide.tags || []),
       guide.category,

@@ -29,7 +29,7 @@ import {
 import { GuideCard } from "@/components/guides/guide-card";
 import { getGuidesForCollection } from "@/lib/internal-links";
 
-import { constructMetadata, generateCollectionJsonLd } from "@/lib/seo";
+import { constructMetadata, generateCollectionJsonLd, getDynamicOgImageUrl } from "@/lib/seo";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 
 interface CollectionPageProps {
@@ -55,10 +55,21 @@ export async function generateMetadata({ params }: CollectionPageProps): Promise
     };
   }
 
+  const ogImageUrl = getDynamicOgImageUrl({
+    title: collection.title,
+    type: "Prompt Collection",
+    category: collection.category,
+    meta: `${collection.promptIds.length} Verified Prompts • Workflow Suite`,
+  });
+
   return constructMetadata({
     title: collection.title,
     description: collection.shortDescription || collection.description,
     path: `/collections/${collection.slug}`,
+    image: {
+      url: ogImageUrl,
+      alt: `${collection.title} - Curated Prompt Suite`,
+    },
     keywords: [
       ...(collection.tags || []),
       collection.category,

@@ -31,7 +31,7 @@ import {
 import { GuideCard } from "@/components/guides/guide-card";
 import { getGuidesForCategory, getCollectionsForCategory } from "@/lib/internal-links";
 
-import { constructMetadata, generateCategoryJsonLd } from "@/lib/seo";
+import { constructMetadata, generateCategoryJsonLd, getDynamicOgImageUrl } from "@/lib/seo";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 
 interface CategoryPageProps {
@@ -57,10 +57,21 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     };
   }
 
+  const ogImageUrl = getDynamicOgImageUrl({
+    title: `${category.name} AI Prompts`,
+    type: "Prompt Category",
+    category: `${category.name} Taxonomy`,
+    meta: "Verified Prompts • Production Ready",
+  });
+
   return constructMetadata({
     title: `${category.name} AI Prompts`,
     description: `Discover practical, verified AI prompts for ${category.name}. ${category.description}`,
     path: `/categories/${category.slug}`,
+    image: {
+      url: ogImageUrl,
+      alt: `${category.name} AI Prompts Directory`,
+    },
     keywords: [
       `${category.name} prompts`,
       `${category.slug} AI`,

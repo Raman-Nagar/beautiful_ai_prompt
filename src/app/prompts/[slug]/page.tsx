@@ -34,7 +34,7 @@ import {
   BookOpen,
 } from "lucide-react";
 
-import { constructMetadata, generatePromptJsonLd } from "@/lib/seo";
+import { constructMetadata, generatePromptJsonLd, getDynamicOgImageUrl } from "@/lib/seo";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 
 interface PromptPageProps {
@@ -60,10 +60,24 @@ export async function generateMetadata({ params }: PromptPageProps): Promise<Met
     };
   }
 
+  const category = getCategoryById(prompt.category);
+  const categoryName = category?.name || prompt.categoryName || prompt.category;
+
+  const ogImageUrl = getDynamicOgImageUrl({
+    title: prompt.title,
+    type: "AI Prompt",
+    category: categoryName,
+    meta: `${prompt.compatibleModels.slice(0, 3).join(" • ")} • ${prompt.difficulty}`,
+  });
+
   return constructMetadata({
     title: prompt.title,
-    description: prompt.shortDescription,
+    description: prompt.shortDescription || prompt.description,
     path: `/prompts/${prompt.slug}`,
+    image: {
+      url: ogImageUrl,
+      alt: `${prompt.title} - AI Prompt Template`,
+    },
     keywords: [
       ...prompt.tags,
       prompt.category,
