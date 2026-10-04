@@ -11,6 +11,7 @@
     "validate:seo": "tsx scripts/validate-seo.ts"
   },
   "dependencies": {
+    "@microsoft/clarity": "^1.0.2",
     "clsx": "^2.1.1",
     "lucide-react": "^1.49.0",
     "next": "16.3.8",

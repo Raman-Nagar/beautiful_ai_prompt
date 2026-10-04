@@ -7,6 +7,7 @@ import { SearchProvider } from "@/components/search/search-context";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { PageViewTracker } from "@/components/analytics/page-view-tracker";
+import { MicrosoftClarity } from "@/components/analytics/clarity";
 import {
   SITE_URL,
   SITE_NAME,
@@ -75,10 +76,10 @@ export const metadata: Metadata = {
   verification:
     process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || process.env.GOOGLE_SITE_VERIFICATION
       ? {
-          google:
-            process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
-            process.env.GOOGLE_SITE_VERIFICATION,
-        }
+        google:
+          process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
+          process.env.GOOGLE_SITE_VERIFICATION,
+      }
       : undefined,
   robots: {
     index: true,
@@ -154,6 +155,7 @@ export default function RootLayout({
           <ToastProvider>
             <SearchProvider>
               <PageViewTracker />
+              <MicrosoftClarity />
               <Navbar />
               <main id="main-content" className="flex-1">
                 {children}
