@@ -1,0 +1,34 @@
+# Beautiful AI Prompt
+> Curated, production-grade AI prompt library and prompt engineering masterclasses for Claude, ChatGPT, and Gemini.
+
+Beautiful AI Prompt provides over 225+ rigorously tested, structured AI prompts, 26 domain categories, 22 curated workflow playbooks, and 12 in-depth prompt engineering guides. Designed for professionals in engineering, product management, content, marketing, education, and career development.
+
+- Website: https://www.beautifulaiprompt.com
+- Prompts Library: https://www.beautifulaiprompt.com/prompts
+- Categories Directory: https://www.beautifulaiprompt.com/categories
+- Playbooks & Collections: https://www.beautifulaiprompt.com/collections
+- Engineering Guides: https://www.beautifulaiprompt.com/guides
+- Sitemap: https://www.beautifulaiprompt.com/sitemap.xml
+
+## Core Engineering Guides
+- [How to Write Better AI Prompts](https://www.beautifulaiprompt.com/guides/how-to-write-better-ai-prompts): Frameworks for prompt architecture, role grounding, constraints, few-shot conditioning, and eliminating hallucinations.
+- [AI Prompts for Software Developers](https://www.beautifulaiprompt.com/guides/ai-prompts-for-software-developers): System design, code reviews, unit testing, legacy refactoring, and API schemas.
+- [AI Prompting for Beginners](https://www.beautifulaiprompt.com/guides/ai-prompting-for-beginners): Step-by-step primer on generating reliable, reproducible outputs from LLMs.
+- [How to Use AI for Learning](https://www.beautifulaiprompt.com/guides/how-to-use-ai-for-learning): Socratic dialogue, Feynman technique, and accelerated skill acquisition.
+- [AI Prompts for Content Creators](https://www.beautifulaiprompt.com/guides/ai-prompts-for-content-creators): Narrative hooks, editorial frameworks, and multi-channel publishing.
+- [AI Prompts for Job Search and Resumes](https://www.beautifulaiprompt.com/guides/ai-prompts-for-job-search-and-resumes): Quantified impact statements, ATS optimization, and mock interviewing.
+
+## Top Categories Hub
+- [Coding](https://www.beautifulaiprompt.com/categories/coding): Software architecture, debugging, algorithms, and automated test generation.
+- [Career](https://www.beautifulaiprompt.com/categories/career): Career transitions, promotion roadmaps, and salary negotiation.
+- [Resume](https://www.beautifulaiprompt.com/categories/resume): Quantified ATS bullet points and executive summaries.
+- [Job Interview](https://www.beautifulaiprompt.com/categories/job-interview): STAR methodology, system design panels, and behavioral simulations.
+- [Marketing](https://www.beautifulaiprompt.com/categories/marketing): Copywriting, value proposition design, and campaign architecture.
+- [Sales](https://www.beautifulaiprompt.com/categories/sales): Cold outreach, objection handling frameworks, and enterprise deal positioning.
+- [Education](https://www.beautifulaiprompt.com/categories/education): Curriculum structuring, interactive tutoring, and exam preparation.
+
+## Curated Collections & Playbooks
+- [Get Your Next Job](https://www.beautifulaiprompt.com/collections/get-your-next-job): Complete playbook from resume overhaul to executive salary negotiation.
+- [AI Prompts for Software Developers](https://www.beautifulaiprompt.com/collections/ai-prompts-for-software-developers): Daily engineering workflows for senior developers.
+- [Build a Better Resume](https://www.beautifulaiprompt.com/collections/build-a-better-resume): Transform bullet points into quantified accomplishments.
+- [Launch a Product](https://www.beautifulaiprompt.com/collections/launch-a-product): GTM positioning, messaging, press releases, and launch sequences.
