@@ -6,6 +6,8 @@ import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { PromptDetailWorkbench } from "@/components/prompts/prompt-detail-workbench";
+import { CompositionOverlay } from "@/components/visual/composition-overlay";
+import { VisualPromptDetails } from "@/components/visual/visual-prompt-details";
 import {
   getAllPrompts,
   getPromptBySlug,
@@ -260,6 +262,31 @@ export default async function PromptDetailPage({ params }: PromptPageProps) {
             </div>
           </div>
         </header>
+
+        {/* ===================================================================== */}
+        {/* Visual Engine: Composition Ruler Canvas & Technical Camera Specs      */}
+        {/* ===================================================================== */}
+        {prompt.visualMetadata && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
+            <div className="lg:col-span-7">
+              <CompositionOverlay
+                imageUrl={prompt.visualMetadata.previewImageUrl}
+                imageAlt={prompt.visualMetadata.previewImageAlt}
+                aspectRatio={prompt.visualMetadata.aspectRatio}
+                cameraInfo={
+                  prompt.visualMetadata.camera?.lens ||
+                  prompt.visualMetadata.camera?.focalLength
+                }
+              />
+            </div>
+            <div className="lg:col-span-5">
+              <VisualPromptDetails
+                metadata={prompt.visualMetadata}
+                promptTitle={prompt.title}
+              />
+            </div>
+          </div>
+        )}
 
         {/* ===================================================================== */}
         {/* Core Product Experience: Main Prompt Card & Browser Customizer        */}

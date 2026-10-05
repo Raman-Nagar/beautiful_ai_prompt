@@ -4,6 +4,10 @@ export type AIModelId =
   | "gemini"
   | "perplexity"
   | "copilot"
+  | "midjourney"
+  | "flux"
+  | "stable-diffusion"
+  | "dall-e"
   | "other";
 
 export interface AIModel {

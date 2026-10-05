@@ -28,6 +28,10 @@ export const VALID_MODEL_IDS: AIModelId[] = [
   "gemini",
   "perplexity",
   "copilot",
+  "midjourney",
+  "flux",
+  "stable-diffusion",
+  "dall-e",
   "other",
 ];
 

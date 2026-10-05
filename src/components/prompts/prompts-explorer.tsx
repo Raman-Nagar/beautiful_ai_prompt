@@ -2,7 +2,8 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Search, X, SlidersHorizontal, ArrowUpDown, Tag as TagIcon, Check, Bookmark } from "lucide-react";
+import { Search, X, SlidersHorizontal, ArrowUpDown, Tag as TagIcon, Check, Bookmark, Sparkles, Camera, FileText } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useSavedPromptIds } from "@/lib/storage";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { Dropdown, DropdownOption } from "@/components/ui/dropdown";
@@ -41,6 +42,7 @@ export function PromptsExplorer({
   const paramUseCase = searchParams.get("useCase") || "all";
   const paramTag = searchParams.get("tag") || "all";
   const paramSort = (searchParams.get("sort") as PromptSortOption) || "popular";
+  const paramEngine = (searchParams.get("engine") as "all" | "visual" | "text") || "all";
   const savedOnly = searchParams.get("saved") === "true";
   const savedIds = useSavedPromptIds();
 
@@ -52,6 +54,7 @@ export function PromptsExplorer({
   const [useCase, setUseCase] = useState<string>(paramUseCase);
   const [tag, setTag] = useState<string>(paramTag);
   const [sort, setSort] = useState<PromptSortOption>(paramSort);
+  const [engine, setEngine] = useState<"all" | "visual" | "text">(paramEngine);
 
   // Helper to sync state to URL params cleanly
   const updateUrlParams = useCallback(
@@ -64,6 +67,7 @@ export function PromptsExplorer({
       tag?: string;
       sort?: string;
       saved?: boolean;
+      engine?: string;
     }) => {
       const params = new URLSearchParams(searchParams.toString());
 
@@ -85,14 +89,19 @@ export function PromptsExplorer({
   );
 
   // Handlers for state updates
+  const handleEngineChange = (val: "all" | "visual" | "text") => {
+    setEngine(val);
+    updateUrlParams({ search, category, model, difficulty, useCase, tag, sort, engine: val });
+  };
+
   const handleSearchChange = (val: string) => {
     setSearch(val);
-    updateUrlParams({ search: val, category, model, difficulty, useCase, tag, sort });
+    updateUrlParams({ search: val, category, model, difficulty, useCase, tag, sort, engine });
   };
 
   const handleCategoryChange = (val: string) => {
     setCategory(val);
-    updateUrlParams({ search, category: val, model, difficulty, useCase, tag, sort });
+    updateUrlParams({ search, category: val, model, difficulty, useCase, tag, sort, engine });
     if (val !== "all") {
       const cat = categories.find((c) => c.slug === val);
       trackCategoryClick(val, cat?.name, "/prompts");
@@ -101,28 +110,28 @@ export function PromptsExplorer({
 
   const handleModelChange = (val: string) => {
     setModel(val);
-    updateUrlParams({ search, category, model: val, difficulty, useCase, tag, sort });
+    updateUrlParams({ search, category, model: val, difficulty, useCase, tag, sort, engine });
   };
 
   const handleDifficultyChange = (val: string) => {
     setDifficulty(val);
-    updateUrlParams({ search, category, model, difficulty: val, useCase, tag, sort });
+    updateUrlParams({ search, category, model, difficulty: val, useCase, tag, sort, engine });
   };
 
   const handleUseCaseChange = (val: string) => {
     setUseCase(val);
-    updateUrlParams({ search, category, model, difficulty, useCase: val, tag, sort });
+    updateUrlParams({ search, category, model, difficulty, useCase: val, tag, sort, engine });
   };
 
   const handleTagToggle = (selectedTag: string) => {
     const nextTag = tag === selectedTag ? "all" : selectedTag;
     setTag(nextTag);
-    updateUrlParams({ search, category, model, difficulty, useCase, tag: nextTag, sort });
+    updateUrlParams({ search, category, model, difficulty, useCase, tag: nextTag, sort, engine });
   };
 
   const handleSortChange = (val: PromptSortOption) => {
     setSort(val);
-    updateUrlParams({ search, category, model, difficulty, useCase, tag, sort: val });
+    updateUrlParams({ search, category, model, difficulty, useCase, tag, sort: val, engine });
   };
 
   const handleClearFilters = () => {
@@ -133,6 +142,7 @@ export function PromptsExplorer({
     setUseCase("all");
     setTag("all");
     setSort("popular");
+    setEngine("all");
     router.replace(pathname, { scroll: false });
   };
 
@@ -194,6 +204,12 @@ export function PromptsExplorer({
     { value: "title", label: "Alphabetical (A–Z)" },
   ];
 
+  const visualCount = useMemo(
+    () => initialPrompts.filter((p) => Boolean(p.visualMetadata)).length,
+    [initialPrompts]
+  );
+  const textCount = initialPrompts.length - visualCount;
+
   // Filter and sort prompts statically
   const filteredPrompts = useMemo(() => {
     let results = filterPrompts({
@@ -208,8 +224,13 @@ export function PromptsExplorer({
     if (savedOnly) {
       results = results.filter((p) => savedIds.includes(p.id));
     }
+    if (engine === "visual") {
+      results = results.filter((p) => Boolean(p.visualMetadata));
+    } else if (engine === "text") {
+      results = results.filter((p) => !p.visualMetadata);
+    }
     return results;
-  }, [search, category, model, difficulty, useCase, tag, sort, savedOnly, savedIds]);
+  }, [search, category, model, difficulty, useCase, tag, sort, savedOnly, savedIds, engine]);
 
   // Track debounced search in explorer
   useEffect(() => {
@@ -234,10 +255,59 @@ export function PromptsExplorer({
     difficulty !== "all" ||
     useCase !== "all" ||
     tag !== "all" ||
+    engine !== "all" ||
     savedOnly;
 
   return (
     <div className="space-y-8">
+      {/* ── Engine Switcher (Visual vs Text Prompts) ── */}
+      <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-xl bg-[var(--secondary)]/60 border border-[var(--border-subtle)] w-fit">
+        <button
+          type="button"
+          onClick={() => handleEngineChange("all")}
+          className={cn(
+            "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5",
+            engine === "all"
+              ? "bg-[var(--card)] text-[var(--foreground)] shadow-xs border border-[var(--border)] font-semibold"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-transparent"
+          )}
+        >
+          <Sparkles className="h-3.5 w-3.5 text-[var(--primary)]" />
+          <span>All Prompts</span>
+          <span className="text-[10px] opacity-60 font-mono">({initialPrompts.length})</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => handleEngineChange("visual")}
+          className={cn(
+            "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5",
+            engine === "visual"
+              ? "bg-[var(--card)] text-[var(--foreground)] shadow-xs border border-amber-400/40 text-amber-300 font-semibold"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-transparent"
+          )}
+        >
+          <Camera className="h-3.5 w-3.5 text-amber-400" />
+          <span>Visual & Generative Art</span>
+          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-amber-400/15 text-amber-300 font-medium">
+            {visualCount}
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={() => handleEngineChange("text")}
+          className={cn(
+            "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5",
+            engine === "text"
+              ? "bg-[var(--card)] text-[var(--foreground)] shadow-xs border border-emerald-400/40 text-emerald-400 font-semibold"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-transparent"
+          )}
+        >
+          <FileText className="h-3.5 w-3.5 text-emerald-400" />
+          <span>Text & Productivity</span>
+          <span className="text-[10px] opacity-60 font-mono">({textCount})</span>
+        </button>
+      </div>
+
       {/* Search Input Bar */}
       <div className="relative">
         <div className="relative flex items-center w-full h-12 sm:h-14 rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--card)] px-4 shadow-sm transition-all focus-within:border-[var(--primary)]/60 focus-within:ring-2 focus-within:ring-[var(--primary)]/8">
@@ -473,8 +543,22 @@ export function PromptsExplorer({
                   <button
                     type="button"
                     onClick={() => {
-                                        updateUrlParams({ search, category, model, difficulty, useCase, tag, sort, saved: false });
+                      updateUrlParams({ search, category, model, difficulty, useCase, tag, sort, saved: false, engine });
                     }}
+                    className="hover:text-[var(--foreground)] cursor-pointer"
+                  >
+                    <X className="h-2.5 w-2.5" />
+                  </button>
+                </Badge>
+              )}
+
+              {/* Active Engine Chip */}
+              {engine !== "all" && (
+                <Badge variant="secondary" size="sm" className="gap-1 text-[11px]">
+                  <span>Format: {engine === "visual" ? "Visual & Art" : "Text & LLM"}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleEngineChange("all")}
                     className="hover:text-[var(--foreground)] cursor-pointer"
                   >
                     <X className="h-2.5 w-2.5" />

@@ -89,9 +89,9 @@ export function generateBreadcrumbJsonLd(
  * Strictly without fake review ratings, stars, or artificial social proof.
  */
 export function generatePromptJsonLd(prompt: Prompt) {
-  return {
+  const schema: Record<string, unknown> = {
     "@context": "https://schema.org",
-    "@type": "TechArticle",
+    "@type": prompt.visualMetadata ? ["TechArticle", "VisualArtwork"] : "TechArticle",
     headline: prompt.title,
     description: prompt.shortDescription || prompt.description,
     url: getPromptCanonicalUrl(prompt.slug),
@@ -115,6 +115,14 @@ export function generatePromptJsonLd(prompt: Prompt) {
       name: prompt.category,
     },
   };
+
+  if (prompt.visualMetadata) {
+    schema.image = prompt.visualMetadata.previewImageUrl;
+    schema.artform = "Generative AI Photography";
+    schema.artMedium = `${prompt.visualMetadata.model} ${prompt.visualMetadata.modelVersion || ""}`.trim();
+  }
+
+  return schema;
 }
 
 /**

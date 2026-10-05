@@ -19,6 +19,37 @@ export interface PromptVariable {
   key?: string;
 }
 
+export type AspectRatio = "1:1" | "16:9" | "9:16" | "4:5" | "3:2" | "2:3" | "21:9";
+
+export interface CameraSettings {
+  focalLength?: string;
+  lens?: string;
+  aperture?: string;
+  shutterSpeed?: string;
+  filmStock?: string;
+}
+
+export interface LightingSettings {
+  type?: string;
+  direction?: string;
+  colorTemperature?: string;
+}
+
+export interface VisualMetadata {
+  previewImageUrl: string;
+  previewImageAlt: string;
+  model: "midjourney" | "flux" | "stable-diffusion" | "dall-e";
+  modelVersion?: string;
+  aspectRatio: AspectRatio;
+  camera?: CameraSettings;
+  lighting?: LightingSettings;
+  styleCategory: "cinematic" | "photography" | "architecture" | "digital-art" | "fashion" | "product";
+  negativePrompt?: string;
+  rawParameters?: string;
+  seed?: string | number;
+  compositionGuides?: ("rule-of-thirds" | "golden-ratio" | "center-crosshair")[];
+}
+
 export interface Prompt {
   id: string;
   slug: string;
@@ -47,6 +78,8 @@ export interface Prompt {
   categoryName?: string;
   /** Alias for prompt body for backwards compatibility with earlier components */
   template?: string;
+  /** Visual metadata for generative image prompts (Midjourney, FLUX, etc.) */
+  visualMetadata?: VisualMetadata;
 }
 
 export type PromptSortOption = "popular" | "trending" | "newest" | "title" | "most-copied";

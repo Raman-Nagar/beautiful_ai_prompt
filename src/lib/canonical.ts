@@ -11,9 +11,9 @@
 
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ||
-  "https://beautifulaiprompt.com";
+  "https://www.beautifulaiprompt.com";
 
-export const CANONICAL_DOMAIN = "beautifulaiprompt.com";
+export const CANONICAL_DOMAIN = "www.beautifulaiprompt.com";
 
 /**
  * Normalizes a route path or URL into a strict canonical absolute URL.

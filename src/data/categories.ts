@@ -235,5 +235,14 @@ export const CATEGORIES: Category[] = [
     featured: false,
     subcategories: ["Risk Identification", "Meeting Action Items", "Status Reports", "Process Optimization"],
   },
+  {
+    id: "cat-visual-art",
+    slug: "visual-art",
+    name: "Visual & Generative Art",
+    description: "Photorealistic portraits, cinematic lighting, architectural rendering, and camera prompt templates for Midjourney and FLUX.1.",
+    icon: "Palette",
+    featured: true,
+    subcategories: ["Cinematic Film", "Studio Portraits", "Architecture", "Product Photography", "Digital Art"],
+  },
 ];
 
