@@ -8,6 +8,7 @@ export function Footer() {
 
   const productLinks = [
     { label: "Prompts Directory", href: "/prompts" },
+    { label: "Composition Ruler", href: "/tools/composition-ruler" },
     { label: "Browse Categories", href: "/categories" },
     { label: "Curated Collections", href: "/collections" },
     { label: "Engineering Guides", href: "/guides" },

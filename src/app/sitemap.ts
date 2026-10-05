@@ -68,6 +68,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: absoluteUrl("/tools/composition-ruler"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
       url: absoluteUrl("/about"),
       lastModified: latestCatalogDate,
       changeFrequency: "monthly",

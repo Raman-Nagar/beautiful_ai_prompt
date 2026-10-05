@@ -18,6 +18,7 @@ import {
   BookmarkCheck,
   BookOpen,
   Bookmark,
+  Grid3X3,
 } from "lucide-react";
 import { useSavedPromptIds } from "@/lib/storage";
 
@@ -57,6 +58,7 @@ export function Navbar() {
     { label: "Categories", href: "/categories", icon: <Layers className="h-4 w-4" /> },
     { label: "Collections", href: "/collections", icon: <BookmarkCheck className="h-4 w-4" /> },
     { label: "Guides", href: "/guides", icon: <BookOpen className="h-4 w-4" /> },
+    { label: "Composition Ruler", href: "/tools/composition-ruler", icon: <Grid3X3 className="h-4 w-4" /> },
   ];
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
