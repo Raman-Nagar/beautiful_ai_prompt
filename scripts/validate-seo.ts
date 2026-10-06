@@ -20,6 +20,7 @@ import { CATEGORIES } from "../src/lib/data/categories";
 import { COLLECTIONS } from "../src/lib/data/collections";
 import { GUIDES } from "../src/lib/data/guides";
 import { getAllModels } from "../src/lib/data/models";
+import { getAllVisualStyles } from "../src/lib/data/visual-styles";
 import {
   isCanonicalUrl,
   getPromptCanonicalUrl,
@@ -27,6 +28,7 @@ import {
   getCollectionCanonicalUrl,
   getGuideCanonicalUrl,
   getModelCanonicalUrl,
+  getStyleCanonicalUrl,
 } from "../src/lib/canonical";
 import { auditInternalLinkGraph } from "../src/lib/internal-links";
 import {
@@ -34,6 +36,8 @@ import {
   generateOrganizationJsonLd,
   generatePromptJsonLd,
   generateGuideJsonLd,
+  generateStylesHubJsonLd,
+  generateStyleJsonLd,
 } from "../src/lib/structured-data";
 import { constructMetadata, getDynamicOgImageUrl } from "../src/lib/seo";
 import sitemap from "../src/app/sitemap";
@@ -162,6 +166,18 @@ function runSeoAudit() {
     const canonical = getModelCanonicalUrl(m.id);
     if (!isCanonicalUrl(canonical)) {
       issues.push({ type: "error", category: "metadata", message: `Invalid model canonical URL: ${canonical}` });
+    }
+  }
+
+  // Visual Styles metadata & canonical URLs
+  const visualStyles = getAllVisualStyles();
+  for (const s of visualStyles) {
+    if (!s.name || !s.description) {
+      issues.push({ type: "error", category: "metadata", message: `Visual style ${s.slug} missing name or description` });
+    }
+    const canonical = getStyleCanonicalUrl(s.slug);
+    if (!isCanonicalUrl(canonical)) {
+      issues.push({ type: "error", category: "metadata", message: `Invalid visual style canonical URL: ${canonical}` });
     }
   }
 
@@ -315,8 +331,15 @@ function runSeoAudit() {
     }
   }
 
-  // Check expected count (14 static routes + dynamic entities + models)
-  const expectedTotal = 14 + PROMPTS.length + CATEGORIES.length + COLLECTIONS.length + GUIDES.length + models.length;
+  // Check expected count (15 static routes + dynamic entities + models + styles)
+  const expectedTotal =
+    15 +
+    PROMPTS.length +
+    CATEGORIES.length +
+    COLLECTIONS.length +
+    GUIDES.length +
+    models.length +
+    visualStyles.length;
   console.log(`  • Sitemap Entries:      ${sitemapEntries.length} (Expected: ${expectedTotal})`);
 
   if (sitemapEntries.length !== expectedTotal) {
@@ -366,6 +389,16 @@ function runSeoAudit() {
       category: "structured-data",
       message: "Prohibited fake rating schema detected in guide JSON-LD!",
     });
+  }
+
+  // Test visual styles schema
+  const stylesHubSchema = generateStylesHubJsonLd(visualStyles);
+  if (stylesHubSchema["@type"] !== "CollectionPage" || !stylesHubSchema.url) {
+    issues.push({ type: "error", category: "structured-data", message: "Invalid Styles Hub schema" });
+  }
+  const sampleStyleSchema = generateStyleJsonLd(visualStyles[0]);
+  if (sampleStyleSchema["@type"] !== "TechArticle" || !sampleStyleSchema.url) {
+    issues.push({ type: "error", category: "structured-data", message: "Invalid Style schema" });
   }
 
   console.log(`  ${colors.green}✔ Schema.org schemas verified (100% authentic, zero fake reviews/ratings).${colors.reset}`);

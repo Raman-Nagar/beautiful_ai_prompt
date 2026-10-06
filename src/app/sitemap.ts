@@ -4,6 +4,7 @@ import { getAllCategories } from "@/lib/data/categories";
 import { getAllCollections } from "@/lib/data/collections";
 import { getAllGuides } from "@/lib/data/guides";
 import { getAllModels } from "@/lib/data/models";
+import { getAllVisualStyles } from "@/lib/data/visual-styles";
 import {
   absoluteUrl,
   getPromptCanonicalUrl,
@@ -11,6 +12,7 @@ import {
   getCollectionCanonicalUrl,
   getGuideCanonicalUrl,
   getModelCanonicalUrl,
+  getStyleCanonicalUrl,
 } from "@/lib/canonical";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -19,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const collections = getAllCollections();
   const guides = getAllGuides();
   const models = getAllModels();
+  const styles = getAllVisualStyles();
 
   // Determine latest real update date across the active content catalog
   let maxTimestamp = 0;
@@ -84,6 +87,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: absoluteUrl("/models"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: absoluteUrl("/styles"),
       lastModified: latestCatalogDate,
       changeFrequency: "weekly",
       priority: 0.85,
@@ -181,6 +190,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: model.isPopular ? 0.85 : 0.75,
   }));
 
+  // 7. Dynamic Visual Style Silos (6 items)
+  const styleRoutes: MetadataRoute.Sitemap = styles.map((style) => ({
+    url: getStyleCanonicalUrl(style.slug),
+    lastModified: latestCatalogDate,
+    changeFrequency: "weekly",
+    priority: 0.85,
+  }));
+
   return [
     ...staticRoutes,
     ...promptRoutes,
@@ -188,5 +205,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...collectionRoutes,
     ...guideRoutes,
     ...modelRoutes,
+    ...styleRoutes,
   ];
 }

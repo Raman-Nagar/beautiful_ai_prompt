@@ -3,6 +3,7 @@ import { Category } from "@/types/category";
 import { Collection } from "@/types/collection";
 import { Guide } from "@/types/guide";
 import { AIModel, ModelDetail } from "@/types/model";
+import { VisualStyle } from "@/types/style";
 import {
   SITE_URL,
   absoluteUrl,
@@ -11,6 +12,7 @@ import {
   getCollectionCanonicalUrl,
   getGuideCanonicalUrl,
   getModelCanonicalUrl,
+  getStyleCanonicalUrl,
 } from "./canonical";
 
 export const SITE_NAME = "Beautiful AI Prompt";
@@ -277,6 +279,76 @@ export function generateModelJsonLd(model: AIModel, detail?: ModelDetail, prompt
         "@type": "Organization",
         name: model.provider,
       },
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: prompts.length,
+      itemListElement: prompts.slice(0, 25).map((p, idx) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        url: getPromptCanonicalUrl(p.slug),
+        name: p.title,
+      })),
+    },
+  };
+}
+
+/**
+ * Generates Schema.org CollectionPage for the visual styles directory
+ */
+export function generateStylesHubJsonLd(styles: VisualStyle[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Visual AI Prompt Styles Directory & Aesthetics Hub",
+    description:
+      "Explore curated visual prompt engineering styles: Cinematic Film, Documentary Photography, Architecture, High Fashion, Commercial Product, and 3D Digital Art.",
+    url: absoluteUrl("/styles"),
+    inLanguage: "en-US",
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: styles.map((s, idx) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        url: getStyleCanonicalUrl(s.slug),
+        name: s.name,
+      })),
+    },
+  };
+}
+
+/**
+ * Generates Schema.org TechArticle & CreativeWork for a specific visual style hub
+ */
+export function generateStyleJsonLd(style: VisualStyle, prompts: Prompt[] = []) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: `${style.name} Prompt Engineering Guide, Optics & Lighting Rules`,
+    description: style.longDescription || style.description,
+    url: getStyleCanonicalUrl(style.slug),
+    inLanguage: "en-US",
+    author: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    image: absoluteUrl(style.heroImage),
+    about: {
+      "@type": "CreativeWork",
+      name: style.name,
+      genre: style.shortName,
+      keywords: style.keyTokens.join(", "),
     },
     mainEntity: {
       "@type": "ItemList",

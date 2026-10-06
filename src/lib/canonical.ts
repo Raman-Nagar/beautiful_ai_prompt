@@ -93,6 +93,13 @@ export function getModelCanonicalUrl(id: string): string {
 }
 
 /**
+ * Canonical URL helper for visual styles
+ */
+export function getStyleCanonicalUrl(slug: string): string {
+  return absoluteUrl(`/styles/${encodeURIComponent(slug.trim())}`);
+}
+
+/**
  * Validates whether a given URL is a valid canonical content URL
  */
 export function isCanonicalUrl(url: string): boolean {

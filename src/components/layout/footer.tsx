@@ -9,6 +9,7 @@ export function Footer() {
   const productLinks = [
     { label: "Prompts Directory", href: "/prompts" },
     { label: "AI Models & Guides", href: "/models" },
+    { label: "Visual Styles Hub", href: "/styles" },
     { label: "Visual Prompt Generator", href: "/tools/prompt-generator" },
     { label: "Composition Ruler", href: "/tools/composition-ruler" },
     { label: "Browse Categories", href: "/categories" },
@@ -25,6 +26,7 @@ export function Footer() {
 
   const resourceLinks = [
     { label: "Midjourney vs FLUX Benchmark", href: "/compare/midjourney-vs-flux" },
+    { label: "Cinematic Optics Guide", href: "/styles/cinematic" },
     { label: "Midjourney Parameters", href: "/models/midjourney" },
     { label: "FLUX.1 Prompt Guide", href: "/models/flux" },
     { label: "Claude 3.7 Framework", href: "/models/claude" },
