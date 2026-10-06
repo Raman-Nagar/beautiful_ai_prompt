@@ -19,12 +19,14 @@ import { PROMPTS } from "../src/lib/data/prompts";
 import { CATEGORIES } from "../src/lib/data/categories";
 import { COLLECTIONS } from "../src/lib/data/collections";
 import { GUIDES } from "../src/lib/data/guides";
+import { getAllModels } from "../src/lib/data/models";
 import {
   isCanonicalUrl,
   getPromptCanonicalUrl,
   getCategoryCanonicalUrl,
   getCollectionCanonicalUrl,
   getGuideCanonicalUrl,
+  getModelCanonicalUrl,
 } from "../src/lib/canonical";
 import { auditInternalLinkGraph } from "../src/lib/internal-links";
 import {
@@ -148,6 +150,18 @@ function runSeoAudit() {
     const canonical = getGuideCanonicalUrl(g.slug);
     if (!isCanonicalUrl(canonical)) {
       issues.push({ type: "error", category: "metadata", message: `Invalid guide canonical URL: ${canonical}` });
+    }
+  }
+
+  // Models metadata & canonical URLs
+  const models = getAllModels();
+  for (const m of models) {
+    if (!m.name || !m.description) {
+      issues.push({ type: "error", category: "metadata", message: `Model ${m.id} missing name or description` });
+    }
+    const canonical = getModelCanonicalUrl(m.id);
+    if (!isCanonicalUrl(canonical)) {
+      issues.push({ type: "error", category: "metadata", message: `Invalid model canonical URL: ${canonical}` });
     }
   }
 
@@ -301,8 +315,8 @@ function runSeoAudit() {
     }
   }
 
-  // Check expected count (11 static routes + dynamic entities)
-  const expectedTotal = 11 + PROMPTS.length + CATEGORIES.length + COLLECTIONS.length + GUIDES.length;
+  // Check expected count (13 static routes + dynamic entities + models)
+  const expectedTotal = 13 + PROMPTS.length + CATEGORIES.length + COLLECTIONS.length + GUIDES.length + models.length;
   console.log(`  • Sitemap Entries:      ${sitemapEntries.length} (Expected: ${expectedTotal})`);
 
   if (sitemapEntries.length !== expectedTotal) {

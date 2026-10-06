@@ -178,7 +178,24 @@ export function getPromptsByCategory(categorySlug: string): Prompt[] {
  * Retrieves all prompts compatible with a specific AI model
  */
 export function getPromptsByModel(modelId: AIModelId): Prompt[] {
-  return PROMPTS.filter((p) => p.compatibleModels.includes(modelId)).map(normalizePrompt);
+  const matched = PROMPTS.filter((p) => p.compatibleModels.includes(modelId));
+  if (matched.length > 0) {
+    return matched.map(normalizePrompt);
+  }
+  if (modelId === "other") {
+    // Return universal open-source compatible coding and reasoning prompts
+    return PROMPTS.filter(
+      (p) =>
+        !p.visualMetadata &&
+        (p.category.includes("code") ||
+          p.category.includes("developer") ||
+          p.category.includes("system-design") ||
+          p.compatibleModels.includes("claude"))
+    )
+      .slice(0, 24)
+      .map(normalizePrompt);
+  }
+  return [];
 }
 
 /**

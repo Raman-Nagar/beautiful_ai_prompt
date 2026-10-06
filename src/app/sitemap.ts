@@ -3,12 +3,14 @@ import { getAllPrompts } from "@/lib/data/prompts";
 import { getAllCategories } from "@/lib/data/categories";
 import { getAllCollections } from "@/lib/data/collections";
 import { getAllGuides } from "@/lib/data/guides";
+import { getAllModels } from "@/lib/data/models";
 import {
   absoluteUrl,
   getPromptCanonicalUrl,
   getCategoryCanonicalUrl,
   getCollectionCanonicalUrl,
   getGuideCanonicalUrl,
+  getModelCanonicalUrl,
 } from "@/lib/canonical";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -16,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const categories = getAllCategories();
   const collections = getAllCollections();
   const guides = getAllGuides();
+  const models = getAllModels();
 
   // Determine latest real update date across the active content catalog
   let maxTimestamp = 0;
@@ -69,6 +72,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: absoluteUrl("/tools/composition-ruler"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: absoluteUrl("/models"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: absoluteUrl("/compare/midjourney-vs-flux"),
       lastModified: latestCatalogDate,
       changeFrequency: "weekly",
       priority: 0.85,
@@ -152,11 +167,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: guide.featured ? 0.9 : 0.8,
   }));
 
+  // 6. Dynamic AI Model Silos (10 items)
+  const modelRoutes: MetadataRoute.Sitemap = models.map((model) => ({
+    url: getModelCanonicalUrl(model.id),
+    lastModified: latestCatalogDate,
+    changeFrequency: "weekly",
+    priority: model.isPopular ? 0.85 : 0.75,
+  }));
+
   return [
     ...staticRoutes,
     ...promptRoutes,
     ...categoryRoutes,
     ...collectionRoutes,
     ...guideRoutes,
+    ...modelRoutes,
   ];
 }

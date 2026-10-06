@@ -8,6 +8,7 @@ export function Footer() {
 
   const productLinks = [
     { label: "Prompts Directory", href: "/prompts" },
+    { label: "AI Models & Guides", href: "/models" },
     { label: "Composition Ruler", href: "/tools/composition-ruler" },
     { label: "Browse Categories", href: "/categories" },
     { label: "Curated Collections", href: "/collections" },
@@ -22,9 +23,12 @@ export function Footer() {
   ];
 
   const resourceLinks = [
-    { label: "Engineering Guides", href: "/guides" },
-    { label: "Curated Collections", href: "/collections" },
-    { label: "Prompt Architecture", href: "/about" },
+    { label: "Midjourney vs FLUX Benchmark", href: "/compare/midjourney-vs-flux" },
+    { label: "Midjourney Parameters", href: "/models/midjourney" },
+    { label: "FLUX.1 Prompt Guide", href: "/models/flux" },
+    { label: "Claude 3.7 Framework", href: "/models/claude" },
+    { label: "ChatGPT-4o Prompts", href: "/models/chatgpt" },
+    { label: "SDXL Cheat Sheet", href: "/models/stable-diffusion" },
   ];
 
   const companyLinks = [

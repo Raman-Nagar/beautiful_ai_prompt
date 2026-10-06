@@ -19,6 +19,7 @@ import {
   BookOpen,
   Bookmark,
   Grid3X3,
+  Sliders,
 } from "lucide-react";
 import { useSavedPromptIds } from "@/lib/storage";
 
@@ -55,6 +56,7 @@ export function Navbar() {
 
   const navLinks = [
     { label: "Prompts", href: "/prompts", icon: <Compass className="h-4 w-4" /> },
+    { label: "Models", href: "/models", icon: <Sliders className="h-4 w-4" /> },
     { label: "Categories", href: "/categories", icon: <Layers className="h-4 w-4" /> },
     { label: "Collections", href: "/collections", icon: <BookmarkCheck className="h-4 w-4" /> },
     { label: "Guides", href: "/guides", icon: <BookOpen className="h-4 w-4" /> },

@@ -2,6 +2,7 @@ import { Prompt } from "@/types/prompt";
 import { Category } from "@/types/category";
 import { Collection } from "@/types/collection";
 import { Guide } from "@/types/guide";
+import { AIModel, ModelDetail } from "@/types/model";
 import {
   SITE_URL,
   absoluteUrl,
@@ -9,6 +10,7 @@ import {
   getCategoryCanonicalUrl,
   getCollectionCanonicalUrl,
   getGuideCanonicalUrl,
+  getModelCanonicalUrl,
 } from "./canonical";
 
 export const SITE_NAME = "Beautiful AI Prompt";
@@ -215,3 +217,77 @@ export function generateCollectionJsonLd(collection: Collection, prompts: Prompt
     })),
   };
 }
+
+/**
+ * Generates Schema.org CollectionPage for the /models hub directory
+ */
+export function generateModelsHubJsonLd(models: AIModel[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "AI Models & Prompt Engineering Hub — Beautiful AI Prompt",
+    description:
+      "Directory of supported AI models including Midjourney, FLUX.1, Claude 3.7, ChatGPT-4o, SDXL, and Gemini. Parameter cheat sheets and compatible prompt templates.",
+    url: absoluteUrl("/models"),
+    inLanguage: "en-US",
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: models.map((m, idx) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        url: getModelCanonicalUrl(m.id),
+        name: m.name,
+      })),
+    },
+  };
+}
+
+/**
+ * Generates Schema.org TechArticle & SoftwareApplication for a specific model hub
+ */
+export function generateModelJsonLd(model: AIModel, detail?: ModelDetail, prompts: Prompt[] = []) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: `${model.name} Prompt Engineering Guide & Parameter Cheat Sheet`,
+    description: detail?.description || model.description,
+    url: getModelCanonicalUrl(model.id),
+    inLanguage: "en-US",
+    author: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    about: {
+      "@type": "SoftwareApplication",
+      name: model.name,
+      applicationCategory: model.engine === "visual" ? "MultimediaApplication" : "DeveloperApplication",
+      operatingSystem: "Cloud / All",
+      author: {
+        "@type": "Organization",
+        name: model.provider,
+      },
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: prompts.length,
+      itemListElement: prompts.slice(0, 25).map((p, idx) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        url: getPromptCanonicalUrl(p.slug),
+        name: p.title,
+      })),
+    },
+  };
+}
+

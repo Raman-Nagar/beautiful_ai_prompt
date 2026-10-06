@@ -86,6 +86,13 @@ export function getGuideCanonicalUrl(slug: string): string {
 }
 
 /**
+ * Canonical URL helper for AI models
+ */
+export function getModelCanonicalUrl(id: string): string {
+  return absoluteUrl(`/models/${encodeURIComponent(id.trim())}`);
+}
+
+/**
  * Validates whether a given URL is a valid canonical content URL
  */
 export function isCanonicalUrl(url: string): boolean {
