@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { getAllModels, getModelById, getFullModelDetail } from "@/lib/data/models";
 import { getPromptsByModel } from "@/lib/data/prompts";
-import { generateModelJsonLd, generateBreadcrumbJsonLd } from "@/lib/structured-data";
+import { generateModelJsonLd, generateBreadcrumbJsonLd, generateFaqJsonLd } from "@/lib/structured-data";
 import { constructMetadata } from "@/lib/seo";
 import { AIModelId } from "@/types/model";
 import {
@@ -22,6 +22,7 @@ import {
   Cpu,
   Layers,
   Terminal,
+  HelpCircle,
 } from "lucide-react";
 
 interface ModelPageProps {
@@ -84,6 +85,7 @@ export default async function ModelHubPage({ params }: ModelPageProps) {
   const siblingModels = allModels.filter((m) => m.id !== model.id && m.engine === model.engine);
 
   const modelJsonLd = generateModelJsonLd(model, detail, prompts);
+  const faqJsonLd = detail?.faqs && detail.faqs.length > 0 ? generateFaqJsonLd(detail.faqs) : null;
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
     { name: "Home", url: "/" },
     { name: "AI Models", url: "/models" },
@@ -98,6 +100,12 @@ export default async function ModelHubPage({ params }: ModelPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(modelJsonLd) }}
       />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
@@ -373,6 +381,31 @@ export default async function ModelHubPage({ params }: ModelPageProps) {
               </div>
             )}
           </div>
+
+          {/* Section: Frequently Asked Technical Questions */}
+          {detail?.faqs && detail.faqs.length > 0 && (
+            <div className="mb-16 space-y-4">
+              <div className="flex items-center gap-2">
+                <HelpCircle className="w-5 h-5 text-[var(--primary)]" />
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+                  Frequently Asked Technical Questions
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {detail.faqs.map((faq, idx) => (
+                  <Card key={idx} className="p-6 space-y-2.5 border-[var(--border)] bg-[var(--card)]">
+                    <h3 className="text-sm font-bold text-[var(--foreground)] leading-snug">
+                      {faq.question}
+                    </h3>
+                    <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Related Sibling Models */}
           {siblingModels.length > 0 && (

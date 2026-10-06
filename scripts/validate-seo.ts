@@ -38,6 +38,8 @@ import {
   generateGuideJsonLd,
   generateStylesHubJsonLd,
   generateStyleJsonLd,
+  generateGuideHowToJsonLd,
+  generateFaqJsonLd,
 } from "../src/lib/structured-data";
 import { constructMetadata, getDynamicOgImageUrl } from "../src/lib/seo";
 import sitemap from "../src/app/sitemap";
@@ -401,7 +403,21 @@ function runSeoAudit() {
     issues.push({ type: "error", category: "structured-data", message: "Invalid Style schema" });
   }
 
-  console.log(`  ${colors.green}✔ Schema.org schemas verified (100% authentic, zero fake reviews/ratings).${colors.reset}`);
+  // Test HowTo schema for guides
+  const sampleHowTo = generateGuideHowToJsonLd(sampleGuide);
+  if (!sampleHowTo || sampleHowTo["@type"] !== "HowTo" || !Array.isArray(sampleHowTo.step)) {
+    issues.push({ type: "error", category: "structured-data", message: "Invalid HowTo schema" });
+  }
+
+  // Test FAQ schema
+  const sampleFaq = generateFaqJsonLd([
+    { question: "Sample question?", answer: "Sample answer." },
+  ]);
+  if (!sampleFaq || sampleFaq["@type"] !== "FAQPage" || !Array.isArray(sampleFaq.mainEntity)) {
+    issues.push({ type: "error", category: "structured-data", message: "Invalid FAQPage schema" });
+  }
+
+  console.log(`  ${colors.green}✔ Schema.org schemas verified (100% authentic, including HowTo & FAQPage).${colors.reset}`);
 
   // =========================================================================
   // 6. OPEN GRAPH & SOCIAL SHARING AUDIT

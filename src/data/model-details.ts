@@ -112,6 +112,23 @@ export const MODEL_DETAILS: Record<string, ModelDetail> = {
       rawPrompt: "Cinematic 35mm street portrait of a woman in an oversized beige trench coat walking through light morning drizzle in central London, soft reflections on wet pavement, Kodak Portra 400 film grain texture, natural side lighting, Leica M6 with Summilux 35mm f/1.4 lens --v 6.1 --ar 16:9 --stylize 200",
       explanation: "Pairs specific camera optics (Leica 35mm f/1.4) with an authentic chemical film stock (Portra 400) and strict aspect ratio parameters to avoid synthetic AI textures.",
     },
+    faqs: [
+      {
+        question: "How do I fix overly smooth or plastic skin in Midjourney v6.1?",
+        answer:
+          "Lower the --stylize parameter to between 50 and 150, specify realistic skin micro-details like 'tactile skin pores, subtle freckles, vellus hair', and describe natural single-source lighting like 'north-facing window daylight'. Avoid words like 'flawless skin' or '4K'.",
+      },
+      {
+        question: "What is the difference between --sref and --cref in Midjourney?",
+        answer:
+          "--sref (Style Reference) transfers the color grading, visual aesthetic, and medium of an image to your new prompt. --cref (Character Reference) locks and transfers specific facial features, hairstyle, and facial anatomy across new generations.",
+      },
+      {
+        question: "How does Midjourney handle text inside images?",
+        answer:
+          "Midjourney v6.1 supports short text strings when enclosed in double quotation marks (e.g. \"BAKERY\"). For longer paragraphs or multiple text elements, diffusion models like FLUX.1 are significantly more reliable.",
+      },
+    ],
   },
 
   flux: {
@@ -188,6 +205,23 @@ export const MODEL_DETAILS: Record<string, ModelDetail> = {
       rawPrompt: "Commercial studio product photograph of a matte terracotta ceramic bottle of cold brew coffee resting on natural white oak. The bottle has a clean minimalist label with the text \"SOLARIS BREW\" in crisp bold serif lettering. Golden morning sunlight streams across the scene, casting soft palm frond shadows on the backdrop. Shot on Hasselblad X2D 100C.",
       explanation: "Leverages FLUX's industry-leading text-in-image capability with specific typographic instructions and material specifications.",
     },
+    faqs: [
+      {
+        question: "Does FLUX.1 recognize Midjourney parameter flags like --ar or --stylize?",
+        answer:
+          "No. FLUX.1 ignores or hallucinates on CLI parameter flags. Instead, set the image width and height directly in your UI (e.g., 1344x768 for 16:9 widescreen) and use natural language sentences for styling.",
+      },
+      {
+        question: "What is the optimal guidance scale for FLUX.1 Dev?",
+        answer:
+          "For photorealistic portraits and scenes, a guidance scale between 2.5 and 3.5 is optimal. Values above 4.5 frequently cause oversaturated colors and plastic skin artifacts.",
+      },
+      {
+        question: "How do I ensure text renders correctly in FLUX.1?",
+        answer:
+          "Place your desired text inside double quotation marks and describe its physical surface (e.g., 'a neon storefront sign displaying the text \"TOKYO NIGHTS\" in pink cursive lettering').",
+      },
+    ],
   },
 
   "stable-diffusion": {

@@ -363,3 +363,50 @@ export function generateStyleJsonLd(style: VisualStyle, prompts: Prompt[] = []) 
   };
 }
 
+/**
+ * Generates Schema.org FAQPage structured data
+ * Following Google Search documentation: each Question includes an Answer.
+ */
+export function generateFaqJsonLd(faqs: Array<{ question: string; answer: string }>) {
+  if (!faqs || faqs.length === 0) return null;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+}
+
+/**
+ * Generates Schema.org HowTo structured data for procedural prompt engineering guides
+ */
+export function generateGuideHowToJsonLd(guide: Guide) {
+  if (!guide.sections || guide.sections.length === 0) return null;
+
+  const readingMinutes = guide.readingTimeMinutes || parseInt(guide.readingTime, 10) || 5;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: guide.title,
+    description: guide.description || guide.excerpt,
+    url: getGuideCanonicalUrl(guide.slug),
+    inLanguage: "en-US",
+    totalTime: `PT${readingMinutes}M`,
+    step: guide.sections.map((section, idx) => ({
+      "@type": "HowToStep",
+      position: idx + 1,
+      name: section.title,
+      text: Array.isArray(section.content) ? section.content.join(" ") : String(section.content),
+      url: `${getGuideCanonicalUrl(guide.slug)}#${section.id}`,
+    })),
+  };
+}
+

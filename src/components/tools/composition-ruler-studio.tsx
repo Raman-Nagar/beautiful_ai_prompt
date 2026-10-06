@@ -177,17 +177,39 @@ export function CompositionRulerStudio() {
     }
   };
 
-  // Track cursor position across image for ruler inspection
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  // Normalized coordinate calculation for mouse and touch events
+  const updateCoords = (clientX: number, clientY: number) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
-    const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    const x = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
     setCursorCoords({ xPct: parseFloat(x.toFixed(1)), yPct: parseFloat(y.toFixed(1)) });
+  };
+
+  // Mouse handlers
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    updateCoords(e.clientX, e.clientY);
   };
 
   const handleMouseLeave = () => {
     setCursorCoords(null);
+  };
+
+  // Touch handlers for mobile and tablet touchscreens
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length > 0) {
+      updateCoords(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length > 0) {
+      updateCoords(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    // Keep the last touched coordinate active so the user can inspect it
   };
 
   // Color Styles
@@ -417,7 +439,7 @@ export function CompositionRulerStudio() {
                   <span>Y: {cursorCoords.yPct}%</span>
                 </div>
               ) : (
-                <span className="hidden sm:inline text-white/40">Hover over canvas for focal coordinates</span>
+                <span className="text-white/40 text-[10px] sm:text-[11px]">Hover or touch canvas to inspect focal point</span>
               )}
             </div>
 
@@ -428,8 +450,11 @@ export function CompositionRulerStudio() {
                 ref={containerRef}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
                 className={cn(
-                  "relative w-full overflow-hidden rounded-xl shadow-2xl select-none cursor-crosshair transition-all duration-300 border border-white/20",
+                  "relative w-full overflow-hidden rounded-xl shadow-2xl select-none cursor-crosshair transition-all duration-300 border border-white/20 touch-none",
                   getAspectRatioPadding()
                 )}
               >
@@ -442,6 +467,30 @@ export function CompositionRulerStudio() {
                   className="object-cover object-center pointer-events-none"
                   priority
                 />
+
+                {/* Dynamic Optical Reticle / Caliper Pin */}
+                {cursorCoords && (
+                  <div
+                    className="absolute pointer-events-none -translate-x-1/2 -translate-y-1/2 z-20 flex items-center justify-center transition-[left,top] duration-75"
+                    style={{ left: `${cursorCoords.xPct}%`, top: `${cursorCoords.yPct}%` }}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-full border border-dashed opacity-80 animate-pulse"
+                      style={{ borderColor: activeColor.hex }}
+                    />
+                    <div
+                      className="absolute w-4 h-4 rounded-full border"
+                      style={{ borderColor: activeColor.hex }}
+                    />
+                    <div
+                      className="absolute w-2 h-2 rounded-full shadow-xs"
+                      style={{ backgroundColor: activeColor.hex }}
+                    />
+                    <div className="absolute top-5 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded bg-black/85 backdrop-blur-md border border-white/20 text-[9px] font-mono text-white whitespace-nowrap shadow-md">
+                      {cursorCoords.xPct}%, {cursorCoords.yPct}%
+                    </div>
+                  </div>
+                )}
 
                 {/* SVG Calibration Grid Overlay */}
                 {activeGuide !== "none" && (

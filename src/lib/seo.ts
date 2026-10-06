@@ -20,6 +20,8 @@ import {
   generateGuideJsonLd,
   generateCategoryJsonLd,
   generateCollectionJsonLd,
+  generateGuideHowToJsonLd,
+  generateFaqJsonLd,
 } from "./structured-data";
 
 export {
@@ -41,6 +43,8 @@ export {
   generateGuideJsonLd,
   generateCategoryJsonLd,
   generateCollectionJsonLd,
+  generateGuideHowToJsonLd,
+  generateFaqJsonLd,
 };
 
 export const DEFAULT_TITLE = "Beautiful AI Prompt — Practical AI Prompts for Real-World Work";

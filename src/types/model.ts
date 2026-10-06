@@ -48,6 +48,10 @@ export interface ModelDetail {
     rawPrompt: string;
     explanation: string;
   };
+  faqs?: Array<{
+    question: string;
+    answer: string;
+  }>;
 }
 
 export interface AIModel {

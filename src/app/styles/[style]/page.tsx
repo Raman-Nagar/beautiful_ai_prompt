@@ -168,7 +168,7 @@ export default async function VisualStylePage({ params }: StylePageProps) {
                     Calibrate in Ruler Studio
                   </Link>
                   <Link
-                    href="/tools/prompt-generator"
+                    href={`/tools/prompt-generator?style=${encodeURIComponent(style.slug)}`}
                     className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 transition-opacity shadow-xs"
                   >
                     <Sliders className="w-3.5 h-3.5" />

@@ -34,7 +34,12 @@ import {
   BookOpen,
 } from "lucide-react";
 
-import { constructMetadata, generateGuideJsonLd, getDynamicOgImageUrl } from "@/lib/seo";
+import {
+  constructMetadata,
+  generateGuideJsonLd,
+  generateGuideHowToJsonLd,
+  getDynamicOgImageUrl,
+} from "@/lib/seo";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { getCategoryForGuide } from "@/lib/internal-links";
 
@@ -106,6 +111,7 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
 
   // Truthful JSON-LD Schema (TechArticle) without any fake ratings or social proof
   const jsonLd = generateGuideJsonLd(guide);
+  const howToJsonLd = generateGuideHowToJsonLd(guide);
 
   return (
     <div className="min-h-screen bg-[var(--background)] pb-24">
@@ -114,6 +120,12 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {howToJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
+        />
+      )}
 
       {/* Semantic Breadcrumb Navigation with BreadcrumbList JSON-LD */}
       <Breadcrumb

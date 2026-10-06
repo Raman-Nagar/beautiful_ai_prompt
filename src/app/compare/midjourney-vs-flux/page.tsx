@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { ComparisonSlider } from "@/components/compare/comparison-slider";
 import { constructMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/canonical";
-import { SITE_NAME } from "@/lib/structured-data";
+import { SITE_NAME, generateFaqJsonLd } from "@/lib/structured-data";
 import {
   Trophy,
   CheckCircle2,
@@ -15,6 +15,7 @@ import {
   Layers,
   Zap,
   Compass,
+  HelpCircle,
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
@@ -31,6 +32,29 @@ export const metadata: Metadata = constructMetadata({
     "diffusion model prompt fidelity",
   ],
 });
+
+const COMPARE_FAQS = [
+  {
+    question: "Which model is better for legible text in AI images, Midjourney v6.1 or FLUX.1?",
+    answer:
+      "FLUX.1 is significantly superior for text rendering. Built on a flow-matching transformer with T5-XXL text conditioning, FLUX.1 reliably renders complex storefront signage, quotes, and bottle labels without typographic gibberish. Midjourney v6.1 has improved short-phrase typography inside double quotes, but frequently hallucinates extra letters on complex compositions.",
+  },
+  {
+    question: "Does FLUX.1 require negative prompts or parameter flags like Midjourney?",
+    answer:
+      "No. Unlike Midjourney, which uses CLI-style parameter flags like --ar, --stylize, --sref, and --no, FLUX.1 relies primarily on pure descriptive natural language with guidance_scale (typically 2.5 to 3.5) and inference step settings. Negative prompting is not natively required in FLUX.1 Dev/Schnell.",
+  },
+  {
+    question: "Which AI image generator produces more photorealistic human portraits?",
+    answer:
+      "FLUX.1 Dev delivers superior candid human skin realism, capturing uncurated micro-textures, subtle blemishes, and natural imperfections without an artificial gloss. Midjourney v6.1 produces dramatic, painterly, and editorial magazine aesthetics with rich color grading, but can default to overly stylized skin unless counterbalanced with lower --stylize values.",
+  },
+  {
+    question: "Can FLUX.1 be run locally or is it cloud-only like Midjourney?",
+    answer:
+      "FLUX.1 Dev and FLUX.1 Schnell weights are open-weights and can be run locally using ComfyUI, Forge, or Ollama on GPUs with 12GB to 24GB VRAM (or quantized GGUF versions on smaller setups). Midjourney is entirely closed-source and accessible exclusively via Discord and its web subscription interface.",
+  },
+];
 
 export default function MidjourneyVsFluxPage() {
   const jsonLd = {
@@ -65,12 +89,20 @@ export default function MidjourneyVsFluxPage() {
     ],
   };
 
+  const faqJsonLd = generateFaqJsonLd(COMPARE_FAQS);
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
 
       <div className="py-10 sm:py-14 bg-[var(--background)] min-h-screen">
         <Container>
@@ -319,6 +351,29 @@ export default function MidjourneyVsFluxPage() {
                 </Link>
               </div>
             </Card>
+          </div>
+
+          {/* Frequently Asked Questions (FAQ) */}
+          <div className="mb-16 space-y-6">
+            <div className="flex items-center gap-2">
+              <HelpCircle className="w-5 h-5 text-[var(--primary)]" />
+              <h2 className="text-2xl font-bold text-[var(--foreground)]">
+                Frequently Asked Technical Questions
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {COMPARE_FAQS.map((faq, idx) => (
+                <Card key={idx} className="p-6 space-y-2.5 border-[var(--border)] bg-[var(--card)]">
+                  <h3 className="text-sm font-bold text-[var(--foreground)] leading-snug">
+                    {faq.question}
+                  </h3>
+                  <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                    {faq.answer}
+                  </p>
+                </Card>
+              ))}
+            </div>
           </div>
 
           {/* Composition Ruler Cross-Promotion */}

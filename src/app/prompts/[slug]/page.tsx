@@ -34,6 +34,8 @@ import {
   HelpCircle,
   Workflow,
   BookOpen,
+  Compass,
+  Sliders,
 } from "lucide-react";
 
 import { constructMetadata, generatePromptJsonLd, getDynamicOgImageUrl } from "@/lib/seo";
@@ -127,15 +129,29 @@ export default async function PromptDetailPage({ params }: PromptPageProps) {
       {/* Semantic Breadcrumb Navigation with BreadcrumbList JSON-LD */}
       <Breadcrumb
         className="no-print"
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Prompts", href: "/prompts" },
-          {
-            label: category?.name || prompt.category,
-            href: `/categories/${prompt.category}`,
-          },
-          { label: prompt.title },
-        ]}
+        items={
+          prompt.visualMetadata?.styleCategory
+            ? [
+                { label: "Home", href: "/" },
+                { label: "Visual Styles", href: "/styles" },
+                {
+                  label:
+                    prompt.visualMetadata.styleCategory.charAt(0).toUpperCase() +
+                    prompt.visualMetadata.styleCategory.slice(1),
+                  href: `/styles/${prompt.visualMetadata.styleCategory}`,
+                },
+                { label: prompt.title },
+              ]
+            : [
+                { label: "Home", href: "/" },
+                { label: "Prompts", href: "/prompts" },
+                {
+                  label: category?.name || prompt.category,
+                  href: `/categories/${prompt.category}`,
+                },
+                { label: prompt.title },
+              ]
+        }
       />
 
       <Container className="pt-8">
@@ -278,6 +294,31 @@ export default async function PromptDetailPage({ params }: PromptPageProps) {
                   prompt.visualMetadata.camera?.focalLength
                 }
               />
+
+              {/* Workstation Tools & Model Guide Links */}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <Link
+                  href="/tools/composition-ruler"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-semibold text-[var(--foreground)] transition-colors shadow-xs"
+                >
+                  <Compass className="w-3.5 h-3.5 text-[var(--primary)]" />
+                  Calibrate in Ruler Studio
+                </Link>
+                <Link
+                  href="/tools/prompt-generator"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-semibold text-[var(--foreground)] transition-colors shadow-xs"
+                >
+                  <Sliders className="w-3.5 h-3.5 text-[var(--primary)]" />
+                  Open in Visual Compiler
+                </Link>
+                <Link
+                  href={`/models/${prompt.visualMetadata.model}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-semibold text-[var(--foreground)] transition-colors shadow-xs"
+                >
+                  <Cpu className="w-3.5 h-3.5 text-[var(--primary)]" />
+                  {prompt.visualMetadata.model.toUpperCase()} Parameter Guide
+                </Link>
+              </div>
             </div>
             <div className="lg:col-span-5">
               <VisualPromptDetails
