@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Prompt } from "@/types/prompt";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -24,6 +25,7 @@ import {
   Tag as TagIcon,
   Trash2,
   FileText,
+  Camera,
 } from "lucide-react";
 import { cn, copyToClipboard } from "@/lib/utils";
 import { trackSearch, trackPromptCopy } from "@/lib/analytics";
@@ -421,6 +423,18 @@ export function SearchCommandDialog({
                         : "bg-[var(--card)] border-[var(--border-subtle)] hover:bg-[var(--secondary)]/60 hover:border-[var(--border)]"
                     )}
                   >
+                    {prompt.visualMetadata?.previewImageUrl && (
+                      <div className="relative h-12 w-12 rounded-lg overflow-hidden shrink-0 border border-white/10 hidden sm:block">
+                        <Image
+                          src={prompt.visualMetadata.previewImageUrl}
+                          alt={prompt.title}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+
                     <div className="flex-1 min-w-0 space-y-1.5">
                       {/* Category, Models & Matched Indicator */}
                       <div className="flex items-center gap-2 flex-wrap">
@@ -430,6 +444,13 @@ export function SearchCommandDialog({
                             query={debouncedQuery}
                           />
                         </Badge>
+
+                        {prompt.visualMetadata && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            <Camera className="w-2.5 h-2.5" />
+                            Visual Art
+                          </span>
+                        )}
 
                         <span className="font-mono text-[10px] text-[var(--muted-foreground)]">
                           {prompt.compatibleModels.slice(0, 3).join(" • ")}

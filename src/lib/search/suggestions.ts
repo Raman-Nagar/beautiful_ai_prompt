@@ -2,18 +2,18 @@ import { Prompt } from "@/types/prompt";
 import { SearchSuggestion } from "./types";
 
 export const CURATED_SEARCH_SUGGESTIONS: string[] = [
+  "midjourney",
+  "flux",
+  "cinematic",
+  "portrait",
+  "architecture",
   "resume",
   "react",
-  "email",
-  "youtube",
-  "marketing",
-  "interview",
   "system design",
-  "nextjs",
-  "typescript",
-  "career",
-  "sales",
+  "marketing",
+  "email",
   "code review",
+  "product photography",
 ];
 
 /**
