@@ -315,8 +315,8 @@ function runSeoAudit() {
     }
   }
 
-  // Check expected count (13 static routes + dynamic entities + models)
-  const expectedTotal = 13 + PROMPTS.length + CATEGORIES.length + COLLECTIONS.length + GUIDES.length + models.length;
+  // Check expected count (14 static routes + dynamic entities + models)
+  const expectedTotal = 14 + PROMPTS.length + CATEGORIES.length + COLLECTIONS.length + GUIDES.length + models.length;
   console.log(`  • Sitemap Entries:      ${sitemapEntries.length} (Expected: ${expectedTotal})`);
 
   if (sitemapEntries.length !== expectedTotal) {

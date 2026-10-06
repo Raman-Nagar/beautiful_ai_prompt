@@ -77,6 +77,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     },
     {
+      url: absoluteUrl("/tools/prompt-generator"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
       url: absoluteUrl("/models"),
       lastModified: latestCatalogDate,
       changeFrequency: "weekly",

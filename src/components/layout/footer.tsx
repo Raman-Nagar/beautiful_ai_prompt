@@ -9,6 +9,7 @@ export function Footer() {
   const productLinks = [
     { label: "Prompts Directory", href: "/prompts" },
     { label: "AI Models & Guides", href: "/models" },
+    { label: "Visual Prompt Generator", href: "/tools/prompt-generator" },
     { label: "Composition Ruler", href: "/tools/composition-ruler" },
     { label: "Browse Categories", href: "/categories" },
     { label: "Curated Collections", href: "/collections" },
