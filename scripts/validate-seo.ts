@@ -333,9 +333,9 @@ function runSeoAudit() {
     }
   }
 
-  // Check expected count (15 static routes + dynamic entities + models + styles)
+  // Check expected count (18 static routes + dynamic entities + models + styles)
   const expectedTotal =
-    15 +
+    18 +
     PROMPTS.length +
     CATEGORIES.length +
     COLLECTIONS.length +

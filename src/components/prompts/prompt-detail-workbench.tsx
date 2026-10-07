@@ -114,6 +114,21 @@ export function PromptDetailWorkbench({ prompt }: PromptDetailWorkbenchProps) {
     showInlineFeedback("customizer-reset", "Reset all parameters to default values.", "info");
   };
 
+  // Apply quick preset theme values to variables
+  const handleApplyPresetTheme = (
+    themeName: string,
+    updater: (curr: Record<string, string>) => Record<string, string>
+  ) => {
+    setFormValues((prev) => updater(prev));
+    showInlineFeedback("quick-preset", `Applied "${themeName}" preset values!`, "success");
+    trackPromptCustomize({
+      promptId: prompt.id,
+      variableCount: variables.length,
+      customizedFields: Object.keys(formValues),
+      sourcePage: typeof window !== "undefined" ? window.location.pathname : `/prompts/${prompt.slug}`,
+    });
+  };
+
   // Copy raw prompt template
   const handleCopyRaw = async () => {
     const ok = await copyToClipboard(rawTemplate);
@@ -517,6 +532,95 @@ export function PromptDetailWorkbench({ prompt }: PromptDetailWorkbenchProps) {
                 <span className="text-[11px] text-[var(--muted-foreground)]">
                   * Indicates required field
                 </span>
+              </div>
+
+              {/* Quick-Fill Presets Bar */}
+              <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--secondary)]/20 space-y-2">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+                  <Sparkles className="h-3 w-3 text-amber-400" />
+                  <span>1-Click Quick Presets</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    onClick={handleResetFields}
+                    className="px-2.5 py-1 rounded-md text-[11px] font-medium border border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                  >
+                    Defaults
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleApplyPresetTheme("Cinematic 35mm", (prev) => {
+                        const updated = { ...prev };
+                        for (const v of variables) {
+                          const k = v.name || v.key || "";
+                          const kl = k.toLowerCase();
+                          if (kl.includes("lens") || kl.includes("camera") || kl.includes("optic")) updated[k] = "Panavision C-Series Anamorphic 35mm";
+                          else if (kl.includes("light")) updated[k] = "Golden hour warm raking rim light with soft bokeh";
+                          else if (kl.includes("style")) updated[k] = "Cinematic 35mm film photograph";
+                          else if (kl.includes("aspect") || kl.includes("ar")) updated[k] = "16:9";
+                          else if (kl.includes("subject") || kl.includes("character")) updated[k] = "a contemplative solitary figure in a classic trench coat";
+                          else if (kl.includes("tone") || kl.includes("mood")) updated[k] = "Atmospheric, moody, rich depth of field";
+                          else if (kl.includes("setting") || kl.includes("environment")) updated[k] = "rain-slicked metropolitan street at twilight";
+                          else if (kl.includes("film") || kl.includes("stock")) updated[k] = "Kodak Vision3 500T 5219 tungsten";
+                        }
+                        return updated;
+                      })
+                    }
+                    className="px-2.5 py-1 rounded-md text-[11px] font-medium border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 transition-colors"
+                  >
+                    🎬 Cinematic 35mm
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleApplyPresetTheme("Cyberpunk Tech", (prev) => {
+                        const updated = { ...prev };
+                        for (const v of variables) {
+                          const k = v.name || v.key || "";
+                          const kl = k.toLowerCase();
+                          if (kl.includes("lens") || kl.includes("camera") || kl.includes("optic")) updated[k] = "Sony FE 24mm f/1.4 GM wide angle";
+                          else if (kl.includes("light")) updated[k] = "Volumetric cyan and magenta neon backlighting";
+                          else if (kl.includes("style")) updated[k] = "Cyberpunk photorealistic speculative sci-fi";
+                          else if (kl.includes("aspect") || kl.includes("ar")) updated[k] = "21:9";
+                          else if (kl.includes("subject") || kl.includes("character")) updated[k] = "cybernetic courier with glowing optic augmentations";
+                          else if (kl.includes("tone") || kl.includes("mood")) updated[k] = "Futuristic, high-contrast, electric";
+                          else if (kl.includes("setting") || kl.includes("environment")) updated[k] = "dense subterranean Neo-Tokyo market with holographic displays";
+                          else if (kl.includes("film") || kl.includes("stock")) updated[k] = "High-ISO digital sensor with subtle sensor grain";
+                        }
+                        return updated;
+                      })
+                    }
+                    className="px-2.5 py-1 rounded-md text-[11px] font-medium border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 transition-colors"
+                  >
+                    ⚡ Cyberpunk Tech
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleApplyPresetTheme("Editorial Luxe", (prev) => {
+                        const updated = { ...prev };
+                        for (const v of variables) {
+                          const k = v.name || v.key || "";
+                          const kl = k.toLowerCase();
+                          if (kl.includes("lens") || kl.includes("camera") || kl.includes("optic")) updated[k] = "Hasselblad 80mm f/2.8 medium format prime";
+                          else if (kl.includes("light")) updated[k] = "Clean 5400K daylight beauty dish with subtle bounce fill";
+                          else if (kl.includes("style")) updated[k] = "High-fashion Vogue studio portraiture";
+                          else if (kl.includes("aspect") || kl.includes("ar")) updated[k] = "4:5";
+                          else if (kl.includes("subject") || kl.includes("character")) updated[k] = "haute couture high-fashion model with striking symmetry";
+                          else if (kl.includes("tone") || kl.includes("mood")) updated[k] = "Minimalist, refined, immaculate skin microtexture";
+                          else if (kl.includes("setting") || kl.includes("environment")) updated[k] = "warm neutral limestone architectural studio";
+                          else if (kl.includes("film") || kl.includes("stock")) updated[k] = "Fujifilm Pro 400H medium format color film";
+                        }
+                        return updated;
+                      })
+                    }
+                    className="px-2.5 py-1 rounded-md text-[11px] font-medium border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 transition-colors"
+                  >
+                    ✨ Editorial Luxe
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-4">

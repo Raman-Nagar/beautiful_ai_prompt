@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -17,6 +17,9 @@ import {
   Compass,
   Terminal,
   Settings2,
+  Share2,
+  AlertTriangle,
+  Info,
 } from "lucide-react";
 
 export type TargetEngine = "midjourney" | "flux" | "stable-diffusion" | "dall-e";
@@ -384,6 +387,173 @@ export function PromptGeneratorStudio() {
     guidanceScale,
     steps,
   ]);
+
+  // Real-time model parameter linter diagnostics
+  const linterIssues = useMemo(() => {
+    const issues: { id: string; level: "warning" | "info" | "tip"; message: string }[] = [];
+
+    if (engine === "flux") {
+      if (negativePrompt.trim().length > 0) {
+        issues.push({
+          id: "flux-negative-prompt",
+          level: "warning",
+          message:
+            "FLUX.1 Schnell/Dev ignores negative prompts natively. Consider baking negative concepts directly into descriptive natural language instead.",
+        });
+      }
+      if (guidanceScale > 4.5) {
+        issues.push({
+          id: "flux-high-guidance",
+          level: "warning",
+          message:
+            "FLUX guidance scale typically performs best between 2.5 and 4.0. Values > 4.5 can introduce plastic burn and high contrast artifacts.",
+        });
+      }
+    }
+
+    if (engine === "dall-e") {
+      if (
+        subject.includes("--") ||
+        environment.includes("--") ||
+        shotType.includes("--")
+      ) {
+        issues.push({
+          id: "dalle-cli-flags",
+          level: "warning",
+          message:
+            "DALL-E 3 utilizes natural language rewriting and does not parse CLI flags (--ar, --v, --stylize).",
+        });
+      }
+      if (negativePrompt.trim().length > 0) {
+        issues.push({
+          id: "dalle-negative-prompt",
+          level: "info",
+          message:
+            "DALL-E 3 does not support negative prompts. Explicitly describe what you WANT in the scene rather than what to avoid.",
+        });
+      }
+    }
+
+    if (engine === "midjourney") {
+      if (!aspectRatio) {
+        issues.push({
+          id: "mj-missing-aspect",
+          level: "tip",
+          message:
+            "Midjourney v6.1 defaults to 1:1 square. Specify --ar for cinematic (16:9) or editorial portrait (4:5) framing.",
+        });
+      }
+      if (stylize > 750) {
+        issues.push({
+          id: "mj-extreme-stylize",
+          level: "info",
+          message:
+            "High stylize values (>750) prioritize artistic interpretation over prompt fidelity.",
+        });
+      }
+      if (chaos > 50) {
+        issues.push({
+          id: "mj-high-chaos",
+          level: "tip",
+          message:
+            "Chaos values above 50 produce highly erratic compositions with unpredictable layout variations.",
+        });
+      }
+    }
+
+    if (engine === "stable-diffusion") {
+      if (guidanceScale < 3.0 || guidanceScale > 10.0) {
+        issues.push({
+          id: "sd-guidance-boundary",
+          level: "tip",
+          message:
+            "SDXL guidance (CFG) scale is optimal between 4.5 and 8.0. Extreme values may cause plastic saturation or weak adherence.",
+        });
+      }
+      if (steps < 20) {
+        issues.push({
+          id: "sd-steps-low",
+          level: "warning",
+          message:
+            "SDXL typically requires at least 25-35 inference steps for fine textural convergence with DPM++ samplers.",
+        });
+      }
+    }
+
+    return issues;
+  }, [engine, negativePrompt, guidanceScale, subject, environment, shotType, aspectRatio, stylize, chaos, steps]);
+
+  const [isShareCopied, setIsShareCopied] = useState(false);
+
+  // Restore compiler state from URL query parameters on mount or popstate
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const applyParams = () => {
+      const searchParams = new URLSearchParams(window.location.search);
+      const engineParam = searchParams.get("engine");
+      if (
+        engineParam &&
+        ["midjourney", "flux", "stable-diffusion", "dall-e"].includes(engineParam)
+      ) {
+        setEngine(engineParam as TargetEngine);
+      }
+      const subjectParam = searchParams.get("subject");
+      if (subjectParam) setSubject(subjectParam);
+
+      const envParam = searchParams.get("environment");
+      if (envParam) setEnvironment(envParam);
+
+      const lensParam = searchParams.get("lens");
+      if (lensParam) setLens(lensParam);
+
+      const apertureParam = searchParams.get("aperture");
+      if (apertureParam) setAperture(apertureParam);
+
+      const aspectParam = searchParams.get("aspect");
+      if (aspectParam) setAspectRatio(aspectParam);
+
+      const lightingParam = searchParams.get("lighting");
+      if (lightingParam) setLightingType(lightingParam);
+
+      const filmParam = searchParams.get("film");
+      if (filmParam) setFilmStock(filmParam);
+
+      const stylizeParam = searchParams.get("stylize");
+      if (stylizeParam && !isNaN(Number(stylizeParam))) {
+        setStylize(Number(stylizeParam));
+      }
+    };
+
+    const timer = setTimeout(applyParams, 0);
+    window.addEventListener("popstate", applyParams);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("popstate", applyParams);
+    };
+  }, []);
+
+  const handleShareSetup = async () => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams();
+    params.set("engine", engine);
+    if (subject) params.set("subject", subject);
+    if (environment) params.set("environment", environment);
+    if (lens) params.set("lens", lens);
+    if (aperture) params.set("aperture", aperture);
+    if (aspectRatio) params.set("aspect", aspectRatio);
+    if (lightingType) params.set("lighting", lightingType);
+    if (filmStock) params.set("film", filmStock);
+    if (stylize !== 200) params.set("stylize", String(stylize));
+
+    const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+    const ok = await copyToClipboard(shareUrl);
+    if (ok) {
+      setIsShareCopied(true);
+      success("Configuration share link copied to clipboard!");
+      setTimeout(() => setIsShareCopied(false), 2500);
+    }
+  };
 
   const handleCopy = async () => {
     const ok = await copyToClipboard(compiledPrompt);
@@ -832,24 +1002,76 @@ export function PromptGeneratorStudio() {
                 {compiledPrompt}
               </div>
 
+              {/* Parameter Diagnostics / Linter */}
+              {linterIssues.length > 0 && (
+                <div className="mt-3.5 space-y-2">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Parameter Diagnostics ({linterIssues.length})</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {linterIssues.map((issue) => (
+                      <div
+                        key={issue.id}
+                        className={`p-2.5 rounded-lg text-xs flex items-start gap-2 border ${
+                          issue.level === "warning"
+                            ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                            : issue.level === "info"
+                            ? "bg-blue-500/10 border-blue-500/30 text-blue-300"
+                            : "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                        }`}
+                      >
+                        {issue.level === "warning" ? (
+                          <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
+                        ) : (
+                          <Info className="w-4 h-4 shrink-0 text-blue-400 mt-0.5" />
+                        )}
+                        <span className="leading-snug">{issue.message}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="pt-4 flex flex-col gap-2.5">
-                <button
-                  onClick={handleCopy}
-                  className="w-full py-3 px-4 rounded-xl bg-[var(--primary)] text-[var(--primary-foreground)] font-bold text-xs sm:text-sm hover:opacity-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-[var(--primary)]/10"
-                >
-                  {isCopied ? (
-                    <>
-                      <Check className="w-4 h-4 text-emerald-300" />
-                      <span>Copied to Clipboard!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                      <span>Copy Compiled Prompt</span>
-                    </>
-                  )}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleCopy}
+                    className="flex-1 py-3 px-4 rounded-xl bg-[var(--primary)] text-[var(--primary-foreground)] font-bold text-xs sm:text-sm hover:opacity-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-[var(--primary)]/10"
+                  >
+                    {isCopied ? (
+                      <>
+                        <Check className="w-4 h-4 text-emerald-300" />
+                        <span>Copied to Clipboard!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        <span>Copy Compiled Prompt</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleShareSetup}
+                    title="Copy shareable configuration URL with current parameters"
+                    className="py-3 px-3.5 rounded-xl border border-[var(--border)] bg-[var(--background)] hover:border-[var(--primary)] text-[var(--foreground)] font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5"
+                  >
+                    {isShareCopied ? (
+                      <>
+                        <Check className="w-4 h-4 text-emerald-400" />
+                        <span className="hidden sm:inline">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="w-4 h-4 text-[var(--primary)]" />
+                        <span className="hidden sm:inline">Share Setup</span>
+                      </>
+                    )}
+                  </button>
+                </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <Link

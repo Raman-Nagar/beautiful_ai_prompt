@@ -25,12 +25,13 @@ export function Footer() {
   ];
 
   const resourceLinks = [
+    { label: "AI Model Comparison Hub", href: "/compare" },
     { label: "Midjourney vs FLUX Benchmark", href: "/compare/midjourney-vs-flux" },
+    { label: "FLUX.1 vs SDXL Comparison", href: "/compare/flux-vs-sdxl" },
+    { label: "Midjourney vs DALL-E 3", href: "/compare/midjourney-vs-dalle-3" },
     { label: "Cinematic Optics Guide", href: "/styles/cinematic" },
     { label: "Midjourney Parameters", href: "/models/midjourney" },
     { label: "FLUX.1 Prompt Guide", href: "/models/flux" },
-    { label: "Claude 3.7 Framework", href: "/models/claude" },
-    { label: "ChatGPT-4o Prompts", href: "/models/chatgpt" },
     { label: "SDXL Cheat Sheet", href: "/models/stable-diffusion" },
   ];
 

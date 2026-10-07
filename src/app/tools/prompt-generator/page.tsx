@@ -116,7 +116,15 @@ export default function PromptGeneratorPage() {
 
           {/* Main Studio Component */}
           <div className="mb-16">
-            <PromptGeneratorStudio />
+            <React.Suspense
+              fallback={
+                <div className="h-96 rounded-xl border border-[var(--border)] bg-[var(--card)] animate-pulse flex items-center justify-center text-xs text-[var(--muted-foreground)]">
+                  Loading prompt compiler studio...
+                </div>
+              }
+            >
+              <PromptGeneratorStudio />
+            </React.Suspense>
           </div>
 
           {/* Educational Guide: Anatomy of a Photorealistic Prompt */}

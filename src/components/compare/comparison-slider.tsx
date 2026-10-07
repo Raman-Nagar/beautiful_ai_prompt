@@ -12,10 +12,22 @@ export interface ComparisonPreset {
   category: string;
   aspectRatio: "16:9" | "4:5";
   prompt: string;
-  midjourneyImage: string;
-  fluxImage: string;
-  midjourneyNotes: string;
-  fluxNotes: string;
+  leftImage?: string;
+  rightImage?: string;
+  leftNotes?: string;
+  rightNotes?: string;
+  midjourneyImage?: string;
+  fluxImage?: string;
+  midjourneyNotes?: string;
+  fluxNotes?: string;
+}
+
+export interface ComparisonSliderProps {
+  presets?: ComparisonPreset[];
+  labels?: {
+    left: string;
+    right: string;
+  };
 }
 
 export const COMPARISON_PRESETS: ComparisonPreset[] = [
@@ -54,7 +66,11 @@ export const COMPARISON_PRESETS: ComparisonPreset[] = [
   },
 ];
 
-export function ComparisonSlider() {
+export function ComparisonSlider({ presets, labels }: ComparisonSliderProps = {}) {
+  const activePresets = presets && presets.length > 0 ? presets : COMPARISON_PRESETS;
+  const leftLabel = labels?.left || "Midjourney v6.1";
+  const rightLabel = labels?.right || "FLUX.1 Dev";
+
   const [activePresetIndex, setActivePresetIndex] = useState(0);
   const [sliderPosition, setSliderPosition] = useState(50); // percentage 0 - 100
   const [isDragging, setIsDragging] = useState(false);
@@ -62,7 +78,11 @@ export function ComparisonSlider() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { success } = useToast();
 
-  const currentPreset = COMPARISON_PRESETS[activePresetIndex];
+  const currentPreset = activePresets[activePresetIndex] || activePresets[0];
+  const leftImg = currentPreset.leftImage || currentPreset.midjourneyImage || "";
+  const rightImg = currentPreset.rightImage || currentPreset.fluxImage || "";
+  const leftNote = currentPreset.leftNotes || currentPreset.midjourneyNotes || "";
+  const rightNote = currentPreset.rightNotes || currentPreset.fluxNotes || "";
 
   const handleMove = useCallback((clientX: number) => {
     if (!containerRef.current) return;
@@ -118,7 +138,7 @@ export function ComparisonSlider() {
           <Eye className="w-3.5 h-3.5 text-[var(--primary)]" />
           Test Scenario:
         </span>
-        {COMPARISON_PRESETS.map((preset, idx) => (
+        {activePresets.map((preset, idx) => (
           <button
             key={preset.id}
             onClick={() => {
@@ -145,11 +165,11 @@ export function ComparisonSlider() {
           currentPreset.aspectRatio === "16:9" ? "aspect-[16/9]" : "aspect-[4/5] max-w-xl mx-auto"
         }`}
       >
-        {/* Right Base Image: FLUX.1 Dev */}
+        {/* Right Base Image */}
         <div className="absolute inset-0 w-full h-full">
           <Image
-            src={currentPreset.fluxImage}
-            alt="FLUX.1 Dev output"
+            src={rightImg}
+            alt={`${rightLabel} output`}
             fill
             sizes="(max-width: 1200px) 100vw, 1200px"
             priority
@@ -158,12 +178,12 @@ export function ComparisonSlider() {
           {/* Label Badge Right */}
           <div className="absolute top-4 right-4 z-10 pointer-events-none">
             <span className="px-3 py-1.5 rounded-md bg-black/75 backdrop-blur-md text-emerald-400 font-mono text-xs font-bold border border-emerald-500/30 shadow-lg">
-              FLUX.1 Dev
+              {rightLabel}
             </span>
           </div>
         </div>
 
-        {/* Left Clipped Image: Midjourney v6.1 */}
+        {/* Left Clipped Image */}
         <div
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{
@@ -171,8 +191,8 @@ export function ComparisonSlider() {
           }}
         >
           <Image
-            src={currentPreset.midjourneyImage}
-            alt="Midjourney v6.1 output"
+            src={leftImg}
+            alt={`${leftLabel} output`}
             fill
             sizes="(max-width: 1200px) 100vw, 1200px"
             priority
@@ -181,7 +201,7 @@ export function ComparisonSlider() {
           {/* Label Badge Left */}
           <div className="absolute top-4 left-4 z-10 pointer-events-none">
             <span className="px-3 py-1.5 rounded-md bg-black/75 backdrop-blur-md text-amber-400 font-mono text-xs font-bold border border-amber-500/30 shadow-lg">
-              Midjourney v6.1
+              {leftLabel}
             </span>
           </div>
         </div>
@@ -209,12 +229,12 @@ export function ComparisonSlider() {
       {/* Rationale & Observation Notes */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
         <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/[0.03]">
-          <span className="font-bold text-amber-400 block mb-1">Midjourney v6.1 Architecture Profile</span>
-          <p className="text-[var(--muted-foreground)] leading-relaxed">{currentPreset.midjourneyNotes}</p>
+          <span className="font-bold text-amber-400 block mb-1">{leftLabel} Architecture Profile</span>
+          <p className="text-[var(--muted-foreground)] leading-relaxed">{leftNote}</p>
         </div>
         <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.03]">
-          <span className="font-bold text-emerald-400 block mb-1">FLUX.1 Dev Architecture Profile</span>
-          <p className="text-[var(--muted-foreground)] leading-relaxed">{currentPreset.fluxNotes}</p>
+          <span className="font-bold text-emerald-400 block mb-1">{rightLabel} Architecture Profile</span>
+          <p className="text-[var(--muted-foreground)] leading-relaxed">{rightNote}</p>
         </div>
       </div>
 

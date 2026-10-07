@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import {
   Grid3X3,
@@ -136,6 +136,7 @@ export function CompositionRulerStudio() {
   const [selectedPreset, setSelectedPreset] = useState<PresetItem>(STUDIO_PRESETS[0]);
   const [customImageUrl, setCustomImageUrl] = useState<string | null>(null);
   const [customImageName, setCustomImageName] = useState<string>("");
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
   // Overlay Guide Controls
   const [activeGuide, setActiveGuide] = useState<GuideType>("rule-of-thirds");
@@ -157,24 +158,74 @@ export function CompositionRulerStudio() {
   const activeImageUrl = customImageUrl || selectedPreset.url;
   const activeImageTitle = customImageUrl ? customImageName : selectedPreset.name;
 
-  // Handle custom image upload
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Cleanup object URL on unmount or replacement
+  useEffect(() => {
+    return () => {
+      if (customImageUrl) {
+        URL.revokeObjectURL(customImageUrl);
+      }
+    };
+  }, [customImageUrl]);
 
+  // Unified file ingestion with aspect ratio auto-detection
+  const loadCustomFile = (file: File) => {
     if (!file.type.startsWith("image/")) {
       toastError("Please upload a valid image file (JPG, PNG, WebP).");
       return;
     }
 
     try {
+      if (customImageUrl) {
+        URL.revokeObjectURL(customImageUrl);
+      }
       const url = URL.createObjectURL(file);
       setCustomImageUrl(url);
       setCustomImageName(file.name);
+
+      // Auto-detect natural aspect ratio
+      const img = new window.Image();
+      img.onload = () => {
+        const ratio = img.naturalWidth / img.naturalHeight;
+        if (Math.abs(ratio - 1) < 0.1) setSimulatedAspect("1:1");
+        else if (Math.abs(ratio - 4 / 5) < 0.1) setSimulatedAspect("4:5");
+        else if (Math.abs(ratio - 16 / 9) < 0.15) setSimulatedAspect("16:9");
+        else if (Math.abs(ratio - 21 / 9) < 0.2) setSimulatedAspect("21:9");
+        else if (Math.abs(ratio - 9 / 16) < 0.15) setSimulatedAspect("9:16");
+        else if (Math.abs(ratio - 3 / 2) < 0.15) setSimulatedAspect("3:2");
+        else setSimulatedAspect("original");
+      };
+      img.src = url;
+
       success(`Loaded custom image "${file.name}"`);
     } catch {
       toastError("Failed to load image. Please try another file.");
     }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) loadCustomFile(file);
+  };
+
+  // Drag and drop handlers
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) loadCustomFile(file);
   };
 
   // Normalized coordinate calculation for mouse and touch events
@@ -302,6 +353,42 @@ export function CompositionRulerStudio() {
             ctx.fill();
           });
         }
+      } else if (activeGuide === "golden-ratio") {
+        ctx.save();
+        ctx.translate(w / 2, h / 2);
+        ctx.rotate((spiralFlip * Math.PI) / 180);
+        ctx.translate(-w / 2, -h / 2);
+
+        // Phi lines
+        ctx.setLineDash([6, 6]);
+        ctx.beginPath();
+        ctx.moveTo(w * 0.382, 0);
+        ctx.lineTo(w * 0.382, h);
+        ctx.moveTo(w * 0.618, 0);
+        ctx.lineTo(w * 0.618, h);
+        ctx.moveTo(0, h * 0.382);
+        ctx.lineTo(w, h * 0.382);
+        ctx.moveTo(0, h * 0.618);
+        ctx.lineTo(w, h * 0.618);
+        ctx.stroke();
+
+        // Parametric logarithmic golden spiral
+        ctx.setLineDash([]);
+        ctx.lineWidth = Math.max(3, w / 300);
+        ctx.beginPath();
+        const centerX = w * 0.285;
+        const centerY = h * 0.673;
+        const a = Math.min(w, h) * 0.005;
+        const b = 0.30635;
+        for (let theta = 0; theta <= 4 * Math.PI; theta += 0.05) {
+          const r = a * Math.exp(b * theta);
+          const px = centerX + r * Math.cos(theta) * (w / Math.min(w, h));
+          const py = centerY + r * Math.sin(theta) * (h / Math.min(w, h));
+          if (theta === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+        ctx.restore();
       } else if (activeGuide === "center-crosshair") {
         ctx.setLineDash([6, 6]);
         ctx.beginPath();
@@ -321,17 +408,88 @@ export function CompositionRulerStudio() {
         ctx.moveTo(w, 0);
         ctx.lineTo(0, h);
         ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, h / 2);
+        ctx.lineTo(w / 2, 0);
+        ctx.moveTo(w / 2, h);
+        ctx.lineTo(w, h / 2);
+        ctx.moveTo(0, h / 2);
+        ctx.lineTo(w / 2, h);
+        ctx.moveTo(w / 2, 0);
+        ctx.lineTo(w, h / 2);
+        ctx.stroke();
+      } else if (activeGuide === "golden-triangles") {
+        ctx.beginPath();
+        ctx.moveTo(0, h);
+        ctx.lineTo(w, 0);
+        ctx.stroke();
+        ctx.setLineDash([6, 6]);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(w * 0.382, h * 0.618);
+        ctx.moveTo(w, h);
+        ctx.lineTo(w * 0.618, h * 0.382);
+        ctx.stroke();
+      }
+
+      // Draw Caliper Reticle Pin if placed
+      if (cursorCoords) {
+        const pinX = (cursorCoords.xPct / 100) * w;
+        const pinY = (cursorCoords.yPct / 100) * h;
+        const r1 = Math.max(16, w / 60);
+        const r2 = Math.max(8, w / 120);
+
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.arc(pinX, pinY, r1, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.arc(pinX, pinY, r2, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(pinX, pinY, Math.max(4, w / 250), 0, Math.PI * 2);
+        ctx.fill();
+
+        // Coordinate readout chip
+        const tagText = `${cursorCoords.xPct}%, ${cursorCoords.yPct}%`;
+        const fontSize = Math.max(11, Math.round(w / 90));
+        ctx.font = `bold ${fontSize}px monospace`;
+        const textWidth = ctx.measureText(tagText).width;
+        const tagPadding = 8;
+        const tagH = Math.max(20, Math.round(w / 50));
+        ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+        ctx.fillRect(pinX - textWidth / 2 - tagPadding, pinY + r1 + 8, textWidth + tagPadding * 2, tagH);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(pinX - textWidth / 2 - tagPadding, pinY + r1 + 8, textWidth + tagPadding * 2, tagH);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(tagText, pinX - textWidth / 2, pinY + r1 + 8 + tagH * 0.7);
       }
 
       ctx.restore();
+
+      // Watermark attribution bar at bottom
+      const bannerHeight = Math.max(26, Math.round(h * 0.035));
+      ctx.fillStyle = "rgba(0, 0, 0, 0.80)";
+      ctx.fillRect(0, h - bannerHeight, w, bannerHeight);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = `${Math.max(10, Math.round(w / 100))}px sans-serif`;
+      ctx.fillText(
+        "Calibrated with Beautiful AI Prompt Composition Studio • https://www.beautifulaiprompt.com",
+        Math.max(14, w * 0.015),
+        h - bannerHeight * 0.32
+      );
 
       // Trigger download
       const dataUrl = canvas.toDataURL("image/png");
       const a = document.createElement("a");
       a.href = dataUrl;
-      a.download = `composition-analyzed-${activeGuide}.png`;
+      a.download = `calibrated-composition-${activeGuide}-${Date.now()}.png`;
       a.click();
-      success("Exported annotated composition image!");
+      success("Exported annotated high-res composition PNG!");
     } catch {
       toastError("Could not export image. Please ensure your browser allows downloads.");
     } finally {
@@ -453,11 +611,24 @@ export function CompositionRulerStudio() {
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
                 className={cn(
                   "relative w-full overflow-hidden rounded-xl shadow-2xl select-none cursor-crosshair transition-all duration-300 border border-white/20 touch-none",
+                  isDragging && "ring-4 ring-[var(--primary)] border-[var(--primary)]",
                   getAspectRatioPadding()
                 )}
               >
+                {/* Drag & Drop Visual Indicator Overlay */}
+                {isDragging && (
+                  <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md border-2 border-dashed border-[var(--primary)] text-white gap-2 pointer-events-none">
+                    <Upload className="w-10 h-10 text-[var(--primary)] animate-bounce" />
+                    <p className="text-sm font-bold">Drop Image to Calibrate</p>
+                    <p className="text-xs text-white/60">Auto-detects aspect ratio & optical grid</p>
+                  </div>
+                )}
+
                 {/* Base Image */}
                 <Image
                   src={activeImageUrl}

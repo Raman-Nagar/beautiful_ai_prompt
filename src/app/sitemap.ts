@@ -98,7 +98,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     },
     {
+      url: absoluteUrl("/compare"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
       url: absoluteUrl("/compare/midjourney-vs-flux"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: absoluteUrl("/compare/flux-vs-sdxl"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: absoluteUrl("/compare/midjourney-vs-dalle-3"),
       lastModified: latestCatalogDate,
       changeFrequency: "weekly",
       priority: 0.85,
