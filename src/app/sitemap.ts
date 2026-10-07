@@ -5,6 +5,7 @@ import { getAllCollections } from "@/lib/data/collections";
 import { getAllGuides } from "@/lib/data/guides";
 import { getAllModels } from "@/lib/data/models";
 import { getAllVisualStyles } from "@/lib/data/visual-styles";
+import { getAllParameters } from "@/lib/data/parameters";
 import {
   absoluteUrl,
   getPromptCanonicalUrl,
@@ -13,6 +14,7 @@ import {
   getGuideCanonicalUrl,
   getModelCanonicalUrl,
   getStyleCanonicalUrl,
+  getParameterCanonicalUrl,
 } from "@/lib/canonical";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -22,6 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const guides = getAllGuides();
   const models = getAllModels();
   const styles = getAllVisualStyles();
+  const parameters = getAllParameters();
 
   // Determine latest real update date across the active content catalog
   let maxTimestamp = 0;
@@ -81,6 +84,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: absoluteUrl("/tools/prompt-generator"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: absoluteUrl("/tools/video-prompt-generator"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: absoluteUrl("/tools/prompt-transpiler"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: absoluteUrl("/parameters"),
       lastModified: latestCatalogDate,
       changeFrequency: "weekly",
       priority: 0.85,
@@ -216,6 +237,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.85,
   }));
 
+  // 8. Dynamic Model Parameters (8 items)
+  const parameterRoutes: MetadataRoute.Sitemap = parameters.map((param) => ({
+    url: getParameterCanonicalUrl(param.slug),
+    lastModified: latestCatalogDate,
+    changeFrequency: "weekly",
+    priority: 0.85,
+  }));
+
   return [
     ...staticRoutes,
     ...promptRoutes,
@@ -224,5 +253,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...guideRoutes,
     ...modelRoutes,
     ...styleRoutes,
+    ...parameterRoutes,
   ];
 }

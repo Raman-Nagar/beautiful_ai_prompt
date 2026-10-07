@@ -100,6 +100,13 @@ export function getStyleCanonicalUrl(slug: string): string {
 }
 
 /**
+ * Canonical URL helper for AI model parameters
+ */
+export function getParameterCanonicalUrl(slug: string): string {
+  return absoluteUrl(`/parameters/${encodeURIComponent(slug.trim())}`);
+}
+
+/**
  * Validates whether a given URL is a valid canonical content URL
  */
 export function isCanonicalUrl(url: string): boolean {

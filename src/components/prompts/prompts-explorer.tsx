@@ -43,6 +43,8 @@ export function PromptsExplorer({
   const paramTag = searchParams.get("tag") || "all";
   const paramSort = (searchParams.get("sort") as PromptSortOption) || "popular";
   const paramEngine = (searchParams.get("engine") as "all" | "visual" | "text") || "all";
+  const paramAspect = searchParams.get("aspect") || "all";
+  const paramComplexity = searchParams.get("complexity") || "all";
   const savedOnly = searchParams.get("saved") === "true";
   const savedIds = useSavedPromptIds();
 
@@ -55,6 +57,8 @@ export function PromptsExplorer({
   const [tag, setTag] = useState<string>(paramTag);
   const [sort, setSort] = useState<PromptSortOption>(paramSort);
   const [engine, setEngine] = useState<"all" | "visual" | "text">(paramEngine);
+  const [aspectRatio, setAspectRatio] = useState<string>(paramAspect);
+  const [complexity, setComplexity] = useState<string>(paramComplexity);
 
   // Helper to sync state to URL params cleanly
   const updateUrlParams = useCallback(
@@ -68,6 +72,8 @@ export function PromptsExplorer({
       sort?: string;
       saved?: boolean;
       engine?: string;
+      aspect?: string;
+      complexity?: string;
     }) => {
       const params = new URLSearchParams(searchParams.toString());
 
@@ -143,6 +149,8 @@ export function PromptsExplorer({
     setTag("all");
     setSort("popular");
     setEngine("all");
+    setAspectRatio("all");
+    setComplexity("all");
     router.replace(pathname, { scroll: false });
   };
 
@@ -229,8 +237,16 @@ export function PromptsExplorer({
     } else if (engine === "text") {
       results = results.filter((p) => !p.visualMetadata);
     }
+    if (aspectRatio !== "all") {
+      results = results.filter((p) => p.visualMetadata?.aspectRatio === aspectRatio);
+    }
+    if (complexity === "ready") {
+      results = results.filter((p) => !p.variables || p.variables.length === 0);
+    } else if (complexity === "parametric") {
+      results = results.filter((p) => p.variables && p.variables.length > 0);
+    }
     return results;
-  }, [search, category, model, difficulty, useCase, tag, sort, savedOnly, savedIds, engine]);
+  }, [search, category, model, difficulty, useCase, tag, sort, savedOnly, savedIds, engine, aspectRatio, complexity]);
 
   // Track debounced search in explorer
   useEffect(() => {
@@ -256,6 +272,8 @@ export function PromptsExplorer({
     useCase !== "all" ||
     tag !== "all" ||
     engine !== "all" ||
+    aspectRatio !== "all" ||
+    complexity !== "all" ||
     savedOnly;
 
   return (
@@ -451,6 +469,93 @@ export function PromptsExplorer({
               </button>
             );
           })}
+        </div>
+
+        {/* Secondary Facets: Aspect Ratio & Parametric Complexity */}
+        <div className="pt-2 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 text-xs">
+          {/* Aspect Ratio Facet */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] font-semibold text-[var(--muted-foreground)] mr-1">
+              Aspect Ratio:
+            </span>
+            {(["all", "16:9", "4:5", "1:1", "21:9"] as const).map((ar) => {
+              const isSelected = aspectRatio === ar;
+              return (
+                <button
+                  key={ar}
+                  type="button"
+                  onClick={() => {
+                    const next = isSelected ? "all" : ar;
+                    setAspectRatio(next);
+                    updateUrlParams({
+                      search,
+                      category,
+                      model,
+                      difficulty,
+                      useCase,
+                      tag,
+                      sort,
+                      engine,
+                      aspect: next,
+                      complexity,
+                    });
+                  }}
+                  className={`px-2 py-0.5 rounded-md font-mono text-[11px] transition-all cursor-pointer ${
+                    isSelected
+                      ? "bg-[var(--primary)] text-[var(--primary-foreground)] font-bold shadow-xs"
+                      : "bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  }`}
+                >
+                  {ar === "all" ? "All Ratios" : ar}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Complexity Facet */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] font-semibold text-[var(--muted-foreground)] mr-1">
+              Structure:
+            </span>
+            {(
+              [
+                { id: "all", label: "All" },
+                { id: "ready", label: "Ready-to-Run (0 Vars)" },
+                { id: "parametric", label: "Parametric (1+ Vars)" },
+              ] as const
+            ).map((comp) => {
+              const isSelected = complexity === comp.id;
+              return (
+                <button
+                  key={comp.id}
+                  type="button"
+                  onClick={() => {
+                    const next = isSelected ? "all" : comp.id;
+                    setComplexity(next);
+                    updateUrlParams({
+                      search,
+                      category,
+                      model,
+                      difficulty,
+                      useCase,
+                      tag,
+                      sort,
+                      engine,
+                      aspect: aspectRatio,
+                      complexity: next,
+                    });
+                  }}
+                  className={`px-2 py-0.5 rounded-md text-[11px] transition-all cursor-pointer ${
+                    isSelected
+                      ? "bg-[var(--primary)] text-[var(--primary-foreground)] font-bold shadow-xs"
+                      : "bg-[var(--secondary)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  }`}
+                >
+                  {comp.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

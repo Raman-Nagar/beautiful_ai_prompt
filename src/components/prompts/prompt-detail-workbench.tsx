@@ -33,6 +33,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { cn, copyToClipboard } from "@/lib/utils";
+import { PromptExportModal } from "./prompt-export-modal";
 
 interface PromptDetailWorkbenchProps {
   prompt: Prompt;
@@ -70,6 +71,7 @@ export function PromptDetailWorkbench({ prompt }: PromptDetailWorkbenchProps) {
 
   const [formValues, setFormValues] = useState<Record<string, string>>(initialValues);
   const [viewMode, setViewMode] = useState<"highlighted" | "raw">("highlighted");
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Non-intrusive inline feedback states (NO intrusive toasts)
   const [feedback, setFeedback] = useState<{
@@ -322,6 +324,18 @@ export function PromptDetailWorkbench({ prompt }: PromptDetailWorkbenchProps) {
               title="Print or export clean prompt sheet to PDF"
             >
               Print
+            </Button>
+
+            {/* Developer / Agent Export */}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setIsExportModalOpen(true)}
+              leftIcon={<Code2 className="h-3.5 w-3.5 text-[var(--primary)]" />}
+              className="text-xs"
+              title="Export as .cursorrules, CLAUDE.md, or API JSON"
+            >
+              Export
             </Button>
 
             {/* Share button */}
@@ -820,6 +834,14 @@ export function PromptDetailWorkbench({ prompt }: PromptDetailWorkbenchProps) {
           </div>
         </section>
       )}
+
+      {/* Developer Workflow Export Modal */}
+      <PromptExportModal
+        prompt={prompt}
+        customValues={formValues}
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+      />
     </div>
   );
 }

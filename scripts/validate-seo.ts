@@ -21,6 +21,7 @@ import { COLLECTIONS } from "../src/lib/data/collections";
 import { GUIDES } from "../src/lib/data/guides";
 import { getAllModels } from "../src/lib/data/models";
 import { getAllVisualStyles } from "../src/lib/data/visual-styles";
+import { PARAMETERS } from "../src/lib/data/parameters";
 import {
   isCanonicalUrl,
   getPromptCanonicalUrl,
@@ -29,6 +30,7 @@ import {
   getGuideCanonicalUrl,
   getModelCanonicalUrl,
   getStyleCanonicalUrl,
+  getParameterCanonicalUrl,
 } from "../src/lib/canonical";
 import { auditInternalLinkGraph } from "../src/lib/internal-links";
 import {
@@ -183,6 +185,17 @@ function runSeoAudit() {
     }
   }
 
+  // AI Model Parameters metadata & canonical URLs
+  for (const param of PARAMETERS) {
+    if (!param.name || (!param.shortDescription && !param.detailedExplanation)) {
+      issues.push({ type: "error", category: "metadata", message: `Parameter ${param.slug} missing name or description` });
+    }
+    const canonical = getParameterCanonicalUrl(param.slug);
+    if (!isCanonicalUrl(canonical)) {
+      issues.push({ type: "error", category: "metadata", message: `Invalid parameter canonical URL: ${canonical}` });
+    }
+  }
+
   console.log(`  ${colors.green}✔ Metadata unique title, description, and canonical checks completed.${colors.reset}`);
 
   // =========================================================================
@@ -333,15 +346,16 @@ function runSeoAudit() {
     }
   }
 
-  // Check expected count (18 static routes + dynamic entities + models + styles)
+  // Check expected count (21 static routes + dynamic entities + models + styles + parameters)
   const expectedTotal =
-    18 +
+    21 +
     PROMPTS.length +
     CATEGORIES.length +
     COLLECTIONS.length +
     GUIDES.length +
     models.length +
-    visualStyles.length;
+    visualStyles.length +
+    PARAMETERS.length;
   console.log(`  • Sitemap Entries:      ${sitemapEntries.length} (Expected: ${expectedTotal})`);
 
   if (sitemapEntries.length !== expectedTotal) {
