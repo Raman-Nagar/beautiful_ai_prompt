@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -22,14 +22,28 @@ import {
   Sliders,
   Palette,
   Scale,
+  ChevronDown,
+  Video,
+  ArrowLeftRight,
 } from "lucide-react";
 import { useSavedPromptIds } from "@/lib/storage";
+
+interface ToolItem {
+  label: string;
+  href: string;
+  description: string;
+  icon: React.ReactNode;
+  badge?: string;
+}
 
 export function Navbar() {
   const pathname = usePathname();
   const { openSearch } = useSearch();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const toolsMenuRef = useRef<HTMLDivElement>(null);
+  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const savedIds = useSavedPromptIds();
 
   // Detect scroll to apply elevated styling
@@ -39,21 +53,43 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile drawer on Escape
+  // Close mobile drawer and tools dropdown on Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && mobileMenuOpen) {
+      if (e.key === "Escape") {
         setMobileMenuOpen(false);
+        setToolsDropdownOpen(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [mobileMenuOpen]);
+  }, []);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (toolsMenuRef.current && !toolsMenuRef.current.contains(event.target as Node)) {
+        setToolsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Reset menus if route changes
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setMobileMenuOpen(false);
+    setToolsDropdownOpen(false);
+  }
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileMenuOpen]);
 
   const navLinks = [
@@ -64,8 +100,59 @@ export function Navbar() {
     { label: "Categories", href: "/categories", icon: <Layers className="h-4 w-4" /> },
     { label: "Collections", href: "/collections", icon: <BookmarkCheck className="h-4 w-4" /> },
     { label: "Guides", href: "/guides", icon: <BookOpen className="h-4 w-4" /> },
-    { label: "Composition Ruler", href: "/tools/composition-ruler", icon: <Grid3X3 className="h-4 w-4" /> },
   ];
+
+  const toolsList: ToolItem[] = [
+    {
+      label: "Prompt Generator",
+      href: "/tools/prompt-generator",
+      description: "Modular visual camera & lighting compiler",
+      icon: <Sparkles className="h-3.5 w-3.5 text-amber-500" />,
+    },
+    {
+      label: "Video Prompt Studio",
+      href: "/tools/video-prompt-generator",
+      description: "Camera motion vectors & director",
+      icon: <Video className="h-3.5 w-3.5 text-cyan-500" />,
+      badge: "New",
+    },
+    {
+      label: "Prompt Transpiler",
+      href: "/tools/prompt-transpiler",
+      description: "Midjourney, FLUX & SDXL converter",
+      icon: <ArrowLeftRight className="h-3.5 w-3.5 text-purple-500" />,
+      badge: "New",
+    },
+    {
+      label: "Composition Ruler",
+      href: "/tools/composition-ruler",
+      description: "Rule of thirds & Fibonacci grid overlay",
+      icon: <Grid3X3 className="h-3.5 w-3.5 text-emerald-500" />,
+    },
+    {
+      label: "Parameter Matrix",
+      href: "/parameters",
+      description: "CLI flags reference & calibration",
+      icon: <Sliders className="h-3.5 w-3.5 text-indigo-500" />,
+      badge: "New",
+    },
+  ];
+
+  const isToolsActive =
+    pathname.startsWith("/tools/") ||
+    pathname === "/parameters" ||
+    pathname.startsWith("/parameters/");
+
+  const handleMouseEnter = () => {
+    if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
+    setToolsDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setToolsDropdownOpen(false);
+    }, 150);
+  };
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
@@ -79,7 +166,7 @@ export function Navbar() {
       )}
     >
       <Container>
-        <div className="flex h-14 items-center justify-between gap-4">
+        <div className="flex h-14 items-center justify-between gap-3 lg:gap-4">
           {/* ── Brand Logo ── */}
           <Link
             href="/"
@@ -93,18 +180,110 @@ export function Navbar() {
             </div>
             {/* Brand text */}
             <div className="flex flex-col leading-none">
-              <span className="text-[13px] font-semibold tracking-tight text-[var(--foreground)]">
+              <span className="text-[13px] font-semibold tracking-tight text-[var(--foreground)] whitespace-nowrap">
                 Beautiful AI Prompt
               </span>
-              <span className="hidden sm:inline text-[9px] font-medium tracking-widest uppercase text-[var(--muted-foreground)] mt-0.5 opacity-70">
+              <span className="hidden sm:inline text-[9px] font-medium tracking-widest uppercase text-[var(--muted-foreground)] mt-0.5 opacity-70 whitespace-nowrap">
                 Productivity Platform
               </span>
             </div>
           </Link>
 
           {/* ── Desktop Nav Links ── */}
-          <nav aria-label="Main Navigation" className="hidden md:flex items-center gap-0.5">
-            {navLinks.map((link) => {
+          <nav aria-label="Main Navigation" className="hidden lg:flex items-center gap-0.5">
+            {/* Prompts Link */}
+            <Link
+              href="/prompts"
+              aria-current={pathname.startsWith("/prompts") && !pathname.includes("saved=true") ? "page" : undefined}
+              className={cn(
+                "flex items-center gap-1.5 rounded-[var(--radius-md)] px-2.5 xl:px-3 py-1.5 text-[13px] font-medium transition-all duration-150 whitespace-nowrap",
+                pathname.startsWith("/prompts") && !pathname.includes("saved=true")
+                  ? "bg-[var(--secondary)] text-[var(--foreground)]"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)]/50"
+              )}
+            >
+              Prompts
+            </Link>
+
+            {/* Tools Dropdown Menu */}
+            <div
+              ref={toolsMenuRef}
+              className="relative"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              <button
+                type="button"
+                onClick={() => setToolsDropdownOpen((prev) => !prev)}
+                aria-expanded={toolsDropdownOpen}
+                aria-haspopup="true"
+                className={cn(
+                  "flex items-center gap-1 rounded-[var(--radius-md)] px-2.5 xl:px-3 py-1.5 text-[13px] font-medium transition-all duration-150 whitespace-nowrap cursor-pointer",
+                  isToolsActive || toolsDropdownOpen
+                    ? "bg-[var(--secondary)] text-[var(--foreground)]"
+                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)]/50"
+                )}
+              >
+                <span>Tools</span>
+                <ChevronDown
+                  className={cn(
+                    "h-3.5 w-3.5 transition-transform duration-200 text-[var(--muted-foreground)]",
+                    toolsDropdownOpen && "rotate-180 text-[var(--foreground)]"
+                  )}
+                />
+              </button>
+
+              {/* Tools Flyout Popover */}
+              {toolsDropdownOpen && (
+                <div className="absolute left-0 top-full pt-1.5 z-50 w-72 origin-top-left animate-in fade-in-0 zoom-in-95 duration-150">
+                  <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card)]/98 p-1.5 shadow-2xl backdrop-blur-xl">
+                    <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] opacity-70">
+                      Creative Studios &amp; Tooling
+                    </div>
+                    <div className="flex flex-col gap-0.5 mt-0.5">
+                      {toolsList.map((tool) => {
+                        const isCurrent = pathname === tool.href;
+                        return (
+                          <Link
+                            key={tool.href}
+                            href={tool.href}
+                            onClick={() => setToolsDropdownOpen(false)}
+                            className={cn(
+                              "group flex items-start gap-2.5 rounded-[var(--radius-md)] px-2.5 py-2 transition-colors",
+                              isCurrent
+                                ? "bg-[var(--secondary)] text-[var(--foreground)]"
+                                : "text-[var(--foreground)] hover:bg-[var(--secondary)]/60"
+                            )}
+                          >
+                            <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--background)] shadow-2xs group-hover:border-[var(--border-strong)] transition-colors">
+                              {tool.icon}
+                            </div>
+                            <div className="flex flex-col flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-1.5">
+                                <span className="text-[12px] font-medium leading-tight truncate">
+                                  {tool.label}
+                                </span>
+                                {tool.badge && (
+                                  <span className="shrink-0 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-1.5 py-0.2 text-[9px] font-semibold leading-tight">
+                                    {tool.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[11px] text-[var(--muted-foreground)] leading-tight truncate mt-0.5">
+                                {tool.description}
+                              </span>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Remaining Primary Links */}
+            {navLinks.slice(1).map((link) => {
               const isActive =
                 pathname === link.href ||
                 (link.href !== "/" && pathname.startsWith(`${link.href}/`));
@@ -114,7 +293,7 @@ export function Navbar() {
                   href={link.href}
                   aria-current={isActive ? "page" : undefined}
                   className={cn(
-                    "flex items-center gap-1.5 rounded-[var(--radius-md)] px-3 py-1.5 text-[13px] font-medium transition-all duration-150",
+                    "flex items-center gap-1.5 rounded-[var(--radius-md)] px-2.5 xl:px-3 py-1.5 text-[13px] font-medium transition-all duration-150 whitespace-nowrap",
                     isActive
                       ? "bg-[var(--secondary)] text-[var(--foreground)]"
                       : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)]/50"
@@ -127,17 +306,17 @@ export function Navbar() {
           </nav>
 
           {/* ── Right Utilities (Desktop) ── */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2 shrink-0">
             {/* Search Trigger */}
             <button
               type="button"
               onClick={openSearch}
               aria-label="Search prompts (⌘K)"
-              className="group flex h-8 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--card)] px-3 text-[13px] text-[var(--muted-foreground)] transition-all hover:border-[var(--border-strong)] hover:text-[var(--foreground)] cursor-pointer"
+              className="group flex h-8 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--card)] px-2.5 xl:px-3 text-[13px] text-[var(--muted-foreground)] transition-all hover:border-[var(--border-strong)] hover:text-[var(--foreground)] cursor-pointer whitespace-nowrap"
             >
               <Search className="h-3.5 w-3.5 shrink-0 group-hover:text-[var(--primary)] transition-colors" />
-              <span className="text-[13px]">Search…</span>
-              <span className="ml-0.5 inline-flex items-center gap-0.5 rounded-[4px] border border-[var(--border-strong)] bg-[var(--secondary)] px-1.5 py-0.5 text-[10px] font-mono text-[var(--subtle-foreground)] leading-none">
+              <span className="text-[12px] xl:text-[13px]">Search…</span>
+              <span className="hidden xl:inline-flex items-center gap-0.5 rounded-[4px] border border-[var(--border-strong)] bg-[var(--secondary)] px-1.5 py-0.5 text-[10px] font-mono text-[var(--subtle-foreground)] leading-none ml-0.5">
                 <span className="text-[9px]">⌘</span>K
               </span>
             </button>
@@ -147,10 +326,10 @@ export function Navbar() {
               href="/prompts?saved=true"
               aria-label={`Saved prompts (${savedIds.length})`}
               title="View saved prompts"
-              className="relative flex h-8 items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--card)] px-2.5 text-[12px] font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--border-strong)] transition-all cursor-pointer"
+              className="relative flex h-8 items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--card)] px-2.5 text-[12px] font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--border-strong)] transition-all cursor-pointer whitespace-nowrap"
             >
               <Bookmark className={`h-3.5 w-3.5 ${savedIds.length > 0 ? "text-[var(--primary)] fill-[var(--primary)]" : ""}`} />
-              <span className="hidden lg:inline">Saved</span>
+              <span className="hidden xl:inline">Saved</span>
               {savedIds.length > 0 && (
                 <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[10px] font-bold text-[var(--primary-foreground)] leading-none">
                   {savedIds.length}
@@ -160,18 +339,18 @@ export function Navbar() {
 
             <ThemeToggle />
 
-            {/* CTA */}
+            {/* Explore Prompts CTA (compact on large, full on xl+) */}
             <Link
               href="/prompts"
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--primary)] px-3.5 text-[13px] font-medium text-[var(--primary-foreground)] shadow-sm transition-all duration-150 hover:bg-[var(--primary-hover)] active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-[var(--primary)]"
+              className="hidden xl:inline-flex h-8 items-center justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--primary)] px-3 text-[12px] font-semibold text-[var(--primary-foreground)] shadow-xs transition-all duration-150 hover:bg-[var(--primary-hover)] active:scale-[0.97] whitespace-nowrap"
             >
               <span>Explore Prompts</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
-          {/* ── Mobile Right Bar ── */}
-          <div className="flex md:hidden items-center gap-1.5">
+          {/* ── Mobile/Tablet Right Bar (< lg) ── */}
+          <div className="flex lg:hidden items-center gap-1.5">
             <button
               type="button"
               onClick={openSearch}
@@ -204,40 +383,86 @@ export function Navbar() {
           role="dialog"
           aria-modal="true"
           aria-label="Navigation"
-          className="md:hidden border-t border-[var(--border)] bg-[var(--background)]/96 backdrop-blur-xl shadow-2xl"
+          className="lg:hidden border-t border-[var(--border)] bg-[var(--background)]/98 backdrop-blur-xl shadow-2xl max-h-[calc(100vh-3.5rem)] overflow-y-auto"
         >
           <Container>
-            <div className="py-4 space-y-3">
-              {/* Nav Links */}
-              <nav className="flex flex-col gap-0.5">
-                {navLinks.map((link) => {
-                  const isActive =
-                    pathname === link.href ||
-                    (link.href !== "/" && pathname.startsWith(`${link.href}/`));
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={closeMobileMenu}
-                      aria-current={isActive ? "page" : undefined}
-                      className={cn(
-                        "flex items-center gap-3 rounded-[var(--radius-md)] px-3.5 py-2.5 text-sm font-medium transition-colors",
-                        isActive
-                          ? "bg-[var(--secondary)] text-[var(--foreground)]"
-                          : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)]/50"
-                      )}
-                    >
-                      <span className={isActive ? "text-[var(--primary)]" : "text-[var(--muted-foreground)]"}>
-                        {link.icon}
-                      </span>
-                      <span>{link.label}</span>
-                    </Link>
-                  );
-                })}
+            <div className="py-4 space-y-4">
+              {/* Primary Nav Links */}
+              <div>
+                <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] opacity-70">
+                  Navigation
+                </p>
+                <nav className="flex flex-col gap-0.5">
+                  {navLinks.map((link) => {
+                    const isActive =
+                      pathname === link.href ||
+                      (link.href !== "/" && pathname.startsWith(`${link.href}/`));
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={closeMobileMenu}
+                        aria-current={isActive ? "page" : undefined}
+                        className={cn(
+                          "flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium transition-colors",
+                          isActive
+                            ? "bg-[var(--secondary)] text-[var(--foreground)]"
+                            : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)]/50"
+                        )}
+                      >
+                        <span className={isActive ? "text-[var(--primary)]" : "text-[var(--muted-foreground)]"}>
+                          {link.icon}
+                        </span>
+                        <span>{link.label}</span>
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              {/* Creative Tools Section */}
+              <div className="border-t border-[var(--border-subtle)] pt-3">
+                <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] opacity-70">
+                  Creative Studios &amp; Tools
+                </p>
+                <div className="flex flex-col gap-0.5">
+                  {toolsList.map((tool) => {
+                    const isCurrent = pathname === tool.href;
+                    return (
+                      <Link
+                        key={tool.href}
+                        href={tool.href}
+                        onClick={closeMobileMenu}
+                        className={cn(
+                          "flex items-center justify-between rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium transition-colors",
+                          isCurrent
+                            ? "bg-[var(--secondary)] text-[var(--foreground)]"
+                            : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)]/50"
+                        )}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="flex h-5 w-5 items-center justify-center">
+                            {tool.icon}
+                          </span>
+                          <span>{tool.label}</span>
+                        </div>
+                        {tool.badge && (
+                          <span className="rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-1.5 py-0.2 text-[9px] font-semibold leading-tight">
+                            {tool.badge}
+                          </span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Saved Prompts */}
+              <div className="border-t border-[var(--border-subtle)] pt-3">
                 <Link
                   href="/prompts?saved=true"
                   onClick={closeMobileMenu}
-                  className="flex items-center justify-between rounded-[var(--radius-md)] px-3.5 py-2.5 text-sm font-medium text-[var(--muted-foreground)] hover:bg-[var(--secondary)]/50 hover:text-[var(--foreground)] transition-colors"
+                  className="flex items-center justify-between rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-[var(--muted-foreground)] hover:bg-[var(--secondary)]/50 hover:text-[var(--foreground)] transition-colors"
                 >
                   <span className="flex items-center gap-3">
                     <Bookmark className={`h-4 w-4 ${savedIds.length > 0 ? "text-[var(--primary)] fill-[var(--primary)]" : ""}`} />
@@ -249,16 +474,16 @@ export function Navbar() {
                     </span>
                   )}
                 </Link>
-              </nav>
+              </div>
 
               {/* Mobile CTA */}
-              <div className="pt-1 border-t border-[var(--border-subtle)]">
+              <div className="pt-2 border-t border-[var(--border-subtle)]">
                 <Link
                   href="/prompts"
                   onClick={closeMobileMenu}
-                  className="flex h-10 w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] px-4 text-sm font-semibold text-[var(--primary-foreground)] shadow-sm transition-colors hover:bg-[var(--primary-hover)] mt-3"
+                  className="flex h-10 w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] px-4 text-sm font-semibold text-[var(--primary-foreground)] shadow-xs transition-colors hover:bg-[var(--primary-hover)]"
                 >
-                  <span>Explore Prompts</span>
+                  <span>Explore All Prompts</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
