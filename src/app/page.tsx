@@ -34,9 +34,9 @@ import type { Metadata } from "next";
 import { constructMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = constructMetadata({
-  title: "Beautiful AI Prompt — Practical AI Prompts for Real-World Work",
+  title: "Beautiful AI Prompt — Tested Prompts for Real-World Work",
   description:
-    "Discover practical AI prompts designed for work, creativity, learning, coding, and everyday productivity. Tested on Claude, ChatGPT, and Gemini.",
+    "Discover practical AI prompts designed for work, creativity, coding, and productivity. Tested on Claude, ChatGPT, Gemini, and Midjourney.",
   path: "/",
 });
 

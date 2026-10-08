@@ -18,9 +18,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "AI Image Model Comparisons & Technical Benchmark Hub (2026)",
+  title: "AI Model Benchmarks & Showdowns",
   description:
-    "Comprehensive head-to-head comparisons of Midjourney v6.1, FLUX.1 Dev, Stable Diffusion XL, and DALL-E 3. Evaluate photorealism, typography, architecture, and prompt adherence.",
+    "Side-by-side AI model comparisons for Midjourney v6.1, FLUX.1, SDXL, and DALL-E 3 across image fidelity, typography, and speed.",
   path: "/compare",
   keywords: [
     "AI image generator comparison",

@@ -16,9 +16,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "Universal AI Prompt Transpiler & Syntax Converter — Midjourney, FLUX, SDXL",
+  title: "AI Prompt Transpiler & Converter",
   description:
-    "Free bidirectional AI prompt syntax transpiler. Automatically convert Midjourney v6.1 CLI flags into FLUX.1 natural language, SDXL positive/negative arrays, and DALL-E 3 narrative paragraphs.",
+    "Convert prompts between Midjourney v6.1, FLUX.1 Dev, SDXL, and DALL-E 3 with instant syntax translation and token diffing.",
   path: "/tools/prompt-transpiler",
   keywords: [
     "prompt transpiler",

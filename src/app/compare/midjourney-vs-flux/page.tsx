@@ -19,9 +19,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "Midjourney v6.1 vs FLUX.1 Dev: Head-to-Head Photorealism Benchmark",
+  title: "Midjourney vs FLUX.1 Benchmark",
   description:
-    "Interactive side-by-side benchmark comparing Midjourney v6.1 and FLUX.1 Dev across prompt adherence, skin micro-texture, lighting, anatomy, and in-image typography.",
+    "Side-by-side benchmark comparing Midjourney v6.1 and FLUX.1 Dev across prompt adherence, skin texture, anatomy, and in-image typography.",
   path: "/compare/midjourney-vs-flux",
   keywords: [
     "Midjourney vs FLUX",

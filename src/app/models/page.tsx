@@ -20,9 +20,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "AI Models & Prompt Engineering Hub — Midjourney, FLUX, Claude, ChatGPT",
+  title: "AI Models & Prompting Guides",
   description:
-    "Explore parameter cheat sheets, prompting frameworks, and battle-tested prompt templates for Midjourney v6.1, FLUX.1, Claude 3.7, ChatGPT-4o, SDXL, and Gemini.",
+    "Explore parameter cheat sheets and prompt templates for Midjourney v6.1, FLUX.1, Claude 3.7, ChatGPT-4o, SDXL, and Gemini.",
   path: "/models",
   keywords: [
     "AI models directory",

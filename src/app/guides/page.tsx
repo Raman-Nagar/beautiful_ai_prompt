@@ -13,9 +13,9 @@ import {
 import { constructMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = constructMetadata({
-  title: "AI Prompt Engineering & Practitioner Guides",
+  title: "AI Prompt Engineering Guides",
   description:
-    "Comprehensive, practical guides for AI prompt engineering, software development, resume writing, interview preparation, marketing, productivity, and research.",
+    "Comprehensive guides for AI prompt engineering, software development, resume writing, interview preparation, marketing, and productivity.",
   path: "/guides",
   keywords: [
     "prompt engineering guides",

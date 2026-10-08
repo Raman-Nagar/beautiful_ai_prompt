@@ -38,7 +38,7 @@ export function absoluteUrl(path: string = "/"): string {
  */
 export function normalizeCanonicalUrl(pathname: string): string {
   if (!pathname || pathname === "/") {
-    return SITE_URL;
+    return `${SITE_URL}/`;
   }
 
   // Strip query strings and hash anchors if present in raw path string
@@ -51,7 +51,7 @@ export function normalizeCanonicalUrl(pathname: string): string {
   const normalizedPath = leadingPath.replace(/\/+$/, "");
 
   if (normalizedPath === "" || normalizedPath === "/") {
-    return SITE_URL;
+    return `${SITE_URL}/`;
   }
 
   return `${SITE_URL}${normalizedPath.toLowerCase()}`;
@@ -113,6 +113,7 @@ export function isCanonicalUrl(url: string): boolean {
   if (!url) return false;
   if (!url.startsWith(SITE_URL)) return false;
   if (url.includes("?") || url.includes("#")) return false;
-  if (url !== SITE_URL && url.endsWith("/")) return false;
+  if (url === `${SITE_URL}/` || url === SITE_URL) return true;
+  if (url.endsWith("/")) return false;
   return true;
 }

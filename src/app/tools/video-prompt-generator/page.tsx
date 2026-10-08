@@ -16,9 +16,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "AI Video Prompt Generator & Camera Motion Director — Runway Gen-3, Kling, Luma",
+  title: "AI Video Prompt Generator & Studio",
   description:
-    "Free AI video prompt builder and camera motion director. Direct 360° orbits, FPV drone dives, dolly zoom vertigo shots, and rack focus formatted for Runway Gen-3 Alpha, Kling AI 1.5, and Luma Dream Machine.",
+    "Generate AI video prompts with camera motion vectors, lens controls, and physics for Runway Gen-3, Kling AI 1.5, and Luma.",
   path: "/tools/video-prompt-generator",
   keywords: [
     "AI video prompt generator",

@@ -16,9 +16,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "AI Image Composition Ruler & Calibration Tool",
+  title: "AI Image Composition Ruler Tool",
   description:
-    "Free online visual composition ruler and optical caliper for AI prompt engineering and photography. Calibrate Rule of Thirds, Fibonacci Golden Spiral, Dynamic Diagonals, and test aspect ratios for Midjourney, FLUX, and SDXL.",
+    "Free online composition ruler and grid overlay for AI art. Test Rule of Thirds, Golden Spiral, and aspect ratios for Midjourney and FLUX.",
   path: "/tools/composition-ruler",
   keywords: [
     "online composition ruler",

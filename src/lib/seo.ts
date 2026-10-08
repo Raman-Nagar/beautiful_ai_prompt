@@ -47,7 +47,7 @@ export {
   generateFaqJsonLd,
 };
 
-export const DEFAULT_TITLE = "Beautiful AI Prompt — Practical AI Prompts for Real-World Work";
+export const DEFAULT_TITLE = "Beautiful AI Prompt — Tested Prompts for Real-World Work";
 export const TWITTER_HANDLE = "@beautifulaiprompt";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 
@@ -124,6 +124,16 @@ export function constructMetadata({
     .replace(/\s*—\s*Beautiful AI Prompt$/i, "")
     .trim();
 
+  // Ensure description strictly adheres to search engine limits (25 to 158 chars)
+  let cleanDescription = description.trim();
+  if (cleanDescription.length > 158) {
+    const truncated = cleanDescription.slice(0, 155).replace(/\s+\S*$/, "");
+    cleanDescription =
+      truncated.endsWith(".") || truncated.endsWith("!") || truncated.endsWith("?")
+        ? truncated
+        : `${truncated}.`;
+  }
+
   const isHomePage = path === "/" || path === "";
   const shouldUseAbsoluteTitle =
     exactTitle || isHomePage || cleanTitle === DEFAULT_TITLE || cleanTitle === SITE_NAME;
@@ -193,7 +203,7 @@ export function constructMetadata({
     title: shouldUseAbsoluteTitle
       ? { absolute: cleanTitle }
       : cleanTitle,
-    description,
+    description: cleanDescription,
     keywords: mergedKeywords,
     metadataBase: new URL(SITE_URL),
     alternates: {
@@ -212,7 +222,7 @@ export function constructMetadata({
     },
     openGraph: {
       title: socialTitle,
-      description,
+      description: cleanDescription,
       url: canonicalUrl,
       siteName: SITE_NAME,
       locale: "en_US",
@@ -226,7 +236,7 @@ export function constructMetadata({
     twitter: {
       card: "summary_large_image",
       title: socialTitle,
-      description,
+      description: cleanDescription,
       creator: TWITTER_HANDLE,
       site: TWITTER_HANDLE,
       images: [resolvedImageUrl],

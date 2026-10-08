@@ -18,9 +18,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "AI Visual Prompt Generator & Parameter Compiler — Midjourney, FLUX, SDXL",
+  title: "AI Visual Prompt Generator Studio",
   description:
-    "Free modular prompt generator for Midjourney v6.1, FLUX.1, and SDXL. Customize camera optics, lighting angles, film stock, aspect ratios, and parameter flags in real time.",
+    "Visual prompt generator for Midjourney v6.1, FLUX.1, and SDXL. Customize camera optics, lighting angles, film stock, and aspect ratios.",
   path: "/tools/prompt-generator",
   keywords: [
     "AI prompt generator",

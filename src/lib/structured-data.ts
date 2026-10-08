@@ -17,7 +17,7 @@ import {
 
 export const SITE_NAME = "Beautiful AI Prompt";
 export const DEFAULT_DESCRIPTION =
-  "The premium AI prompt discovery and productivity platform. Discover, customize, and copy battle-tested prompts for engineering, product, marketing, and design.";
+  "Curated directory of production-tested AI prompts. Discover, customize, and run battle-tested prompts for engineering, marketing, and design.";
 
 /**
  * Generates Schema.org WebSite structured data with SearchAction

@@ -15,9 +15,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "AI Model Parameter & CLI Flag Calibration Hub — Midjourney, FLUX, SDXL",
+  title: "AI Model Parameters & Flags Guide",
   description:
-    "Complete reference directory for AI image model parameters. Deep calibration guides for Midjourney --sref, --cref, --stylize, --chaos, --style raw, FLUX guidance scale, and SDXL CFG scale.",
+    "Calibration guides and syntax reference for Midjourney flags (--sref, --cref, --stylize), FLUX guidance, and SDXL CFG scale.",
   path: "/parameters",
   keywords: [
     "Midjourney parameters",

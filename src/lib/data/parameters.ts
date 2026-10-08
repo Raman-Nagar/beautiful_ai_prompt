@@ -11,7 +11,7 @@ export const PARAMETERS: ModelParameter[] = [
     defaultValue: "None",
     range: "1 to 5 Image URLs, Style Weight 0 - 1000",
     shortDescription:
-      "Transfers the complete aesthetic palette, color grading, brushstrokes, and visual vibe from reference images onto a new prompt subject without copying the reference subject.",
+      "Transfers the aesthetic palette, color grading, lighting, and visual style from reference image URLs into newly generated Midjourney grids.",
     detailedExplanation:
       "The Style Reference parameter (--sref) is one of the most powerful features in Midjourney v6.1. By appending one or more public image URLs, Midjourney extracts abstract stylistic features—such as chromatic grading, painterly strokes, lighting intensity, and film grain—and applies them to whatever new subject you describe. Unlike image prompts which influence composition and subject matter, --sref influences aesthetic texture exclusively.",
     recommendedValues: [

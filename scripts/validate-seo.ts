@@ -116,6 +116,16 @@ function runSeoAudit() {
       promptDescriptions.set(normalizedDesc, p.id);
     }
 
+    // Length validation (25 to 160 chars for Bing/Google snippet compliance)
+    if (desc.length < 25 || desc.length > 160) {
+      issues.push({
+        type: "error",
+        category: "metadata",
+        message: `Prompt ${p.id} description length (${desc.length}) outside 25-160 chars`,
+        entityId: p.id,
+      });
+    }
+
     // Canonical URL validation
     const canonical = getPromptCanonicalUrl(p.slug);
     if (!isCanonicalUrl(canonical)) {
@@ -133,6 +143,9 @@ function runSeoAudit() {
     if (!c.name || !c.description) {
       issues.push({ type: "error", category: "metadata", message: `Category ${c.slug} missing name or description` });
     }
+    if (c.description.length < 25 || c.description.length > 160) {
+      issues.push({ type: "error", category: "metadata", message: `Category ${c.slug} description length outside 25-160 chars` });
+    }
     const canonical = getCategoryCanonicalUrl(c.slug);
     if (!isCanonicalUrl(canonical)) {
       issues.push({ type: "error", category: "metadata", message: `Invalid category canonical URL: ${canonical}` });
@@ -141,8 +154,12 @@ function runSeoAudit() {
 
   // Collections metadata
   for (const col of COLLECTIONS) {
-    if (!col.title || (!col.description && !col.shortDescription)) {
+    const colDesc = col.shortDescription || col.description || "";
+    if (!col.title || !colDesc) {
       issues.push({ type: "error", category: "metadata", message: `Collection ${col.slug} missing title or description` });
+    }
+    if (colDesc.length < 25 || colDesc.length > 160) {
+      issues.push({ type: "error", category: "metadata", message: `Collection ${col.slug} description length outside 25-160 chars` });
     }
     const canonical = getCollectionCanonicalUrl(col.slug);
     if (!isCanonicalUrl(canonical)) {
@@ -152,8 +169,12 @@ function runSeoAudit() {
 
   // Guides metadata
   for (const g of GUIDES) {
-    if (!g.title || (!g.description && !g.excerpt)) {
+    const gDesc = g.excerpt || g.description || "";
+    if (!g.title || !gDesc) {
       issues.push({ type: "error", category: "metadata", message: `Guide ${g.slug} missing title or description` });
+    }
+    if (gDesc.length < 25 || gDesc.length > 160) {
+      issues.push({ type: "error", category: "metadata", message: `Guide ${g.slug} description length outside 25-160 chars` });
     }
     const canonical = getGuideCanonicalUrl(g.slug);
     if (!isCanonicalUrl(canonical)) {
@@ -164,8 +185,12 @@ function runSeoAudit() {
   // Models metadata & canonical URLs
   const models = getAllModels();
   for (const m of models) {
-    if (!m.name || !m.description) {
+    const mDesc = m.description || "";
+    if (!m.name || !mDesc) {
       issues.push({ type: "error", category: "metadata", message: `Model ${m.id} missing name or description` });
+    }
+    if (mDesc.length < 25 || mDesc.length > 160) {
+      issues.push({ type: "error", category: "metadata", message: `Model ${m.id} description length outside 25-160 chars` });
     }
     const canonical = getModelCanonicalUrl(m.id);
     if (!isCanonicalUrl(canonical)) {
@@ -179,6 +204,9 @@ function runSeoAudit() {
     if (!s.name || !s.description) {
       issues.push({ type: "error", category: "metadata", message: `Visual style ${s.slug} missing name or description` });
     }
+    if (s.description.length < 25 || s.description.length > 160) {
+      issues.push({ type: "error", category: "metadata", message: `Visual style ${s.slug} description length outside 25-160 chars` });
+    }
     const canonical = getStyleCanonicalUrl(s.slug);
     if (!isCanonicalUrl(canonical)) {
       issues.push({ type: "error", category: "metadata", message: `Invalid visual style canonical URL: ${canonical}` });
@@ -189,6 +217,9 @@ function runSeoAudit() {
   for (const param of PARAMETERS) {
     if (!param.name || (!param.shortDescription && !param.detailedExplanation)) {
       issues.push({ type: "error", category: "metadata", message: `Parameter ${param.slug} missing name or description` });
+    }
+    if (param.shortDescription.length < 25 || param.shortDescription.length > 160) {
+      issues.push({ type: "error", category: "metadata", message: `Parameter ${param.slug} description length outside 25-160 chars` });
     }
     const canonical = getParameterCanonicalUrl(param.slug);
     if (!isCanonicalUrl(canonical)) {

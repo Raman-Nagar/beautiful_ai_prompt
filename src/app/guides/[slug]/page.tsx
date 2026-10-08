@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: GuidePageProps): Promise<Meta
 
   return constructMetadata({
     title: guide.title,
-    description: guide.description || guide.excerpt,
+    description: guide.excerpt || guide.description,
     path: `/guides/${guide.slug}`,
     image: {
       url: ogImageUrl,

@@ -17,9 +17,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "Midjourney v6.1 vs DALL-E 3: Aesthetic Realism vs Conversational AI",
+  title: "Midjourney vs DALL-E 3 Benchmark",
   description:
-    "Direct side-by-side benchmark comparing Midjourney v6.1 and OpenAI's DALL-E 3. Evaluate photographic optics, prompt expansion in ChatGPT, aspect ratio freedom, and skin textures.",
+    "Direct benchmark comparing Midjourney v6.1 and DALL-E 3 across photographic optics, prompt expansion in ChatGPT, aspect ratios, and textures.",
   path: "/compare/midjourney-vs-dalle-3",
   keywords: [
     "Midjourney vs DALL-E 3",

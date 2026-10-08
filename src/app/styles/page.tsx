@@ -20,9 +20,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "Visual AI Prompt Styles Directory & Optics Hub — Cinematic, Architecture, Fashion",
+  title: "AI Prompt Styles & Optics Directory",
   description:
-    "Explore 6 curated visual generative AI styles: Cinematic Film, Documentary Photography, Architecture, High Fashion, Commercial Product, and 3D Digital Art. Complete with optical camera presets and lighting guidelines.",
+    "Browse 6 visual AI prompt styles including cinematic film, architecture, and photography with camera and lighting presets.",
   path: "/styles",
   keywords: [
     "visual AI prompt styles",

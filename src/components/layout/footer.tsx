@@ -140,26 +140,27 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* ── Resources + Company + Legal ── */}
-          <div className="space-y-5">
-            <div className="space-y-3">
-              <h3 className="text-[10px] font-semibold uppercase tracking-widest text-[var(--foreground)]">
-                Resources
-              </h3>
-              <ul className="space-y-2.5">
-                {resourceLinks.map((item) => (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      className="text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* ── Resources ── */}
+          <div className="space-y-3">
+            <h3 className="text-[10px] font-semibold uppercase tracking-widest text-[var(--foreground)]">
+              Resources
+            </h3>
+            <ul className="space-y-2.5">
+              {resourceLinks.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
+          {/* ── Company + Legal ── */}
+          <div className="space-y-5">
             <div className="space-y-3">
               <h3 className="text-[10px] font-semibold uppercase tracking-widest text-[var(--foreground)]">
                 Company
@@ -177,24 +178,24 @@ export function Footer() {
                 ))}
               </ul>
             </div>
-          </div>
 
-          <div className="space-y-3">
-            <h3 className="text-[10px] font-semibold uppercase tracking-widest text-[var(--foreground)]">
-              Legal
-            </h3>
-            <ul className="space-y-2.5">
-              {legalLinks.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <div className="space-y-3">
+              <h3 className="text-[10px] font-semibold uppercase tracking-widest text-[var(--foreground)]">
+                Legal
+              </h3>
+              <ul className="space-y-2.5">
+                {legalLinks.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className="text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 

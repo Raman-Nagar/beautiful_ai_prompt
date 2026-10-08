@@ -17,9 +17,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "FLUX.1 Dev vs Stable Diffusion XL: Open-Weights Image Benchmark",
+  title: "FLUX.1 vs SDXL Model Benchmark",
   description:
-    "Comprehensive benchmark comparing FLUX.1 Dev and Stable Diffusion XL (SDXL). Evaluate flow-matching transformers vs U-Net latent diffusion, VRAM demands, text rendering, and anatomy.",
+    "Benchmark comparing FLUX.1 Dev and Stable Diffusion XL (SDXL) across transformer architecture, VRAM demands, text rendering, and anatomy.",
   path: "/compare/flux-vs-sdxl",
   keywords: [
     "FLUX vs SDXL",
