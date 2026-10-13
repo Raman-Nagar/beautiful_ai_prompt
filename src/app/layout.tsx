@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   publisher: SITE_NAME,
   metadataBase: new URL(SITE_URL),
   alternates: {
-    canonical: SITE_URL,
+    canonical: `${SITE_URL}/`,
   },
   icons: {
     icon: [
