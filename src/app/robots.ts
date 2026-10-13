@@ -7,12 +7,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: [
-          "/api/",
-          "/_next/",
-          "/admin/",
-          "/private/",
-        ],
+        disallow: ["/api/"],
       },
       {
         userAgent: [
@@ -27,12 +22,7 @@ export default function robots(): MetadataRoute.Robots {
           "cohere-ai",
         ],
         allow: "/",
-        disallow: [
-          "/api/",
-          "/_next/",
-          "/admin/",
-          "/private/",
-        ],
+        disallow: ["/api/"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
