@@ -672,7 +672,7 @@ export const PROMPTS_VISUAL: Prompt[] = [
     updatedAt: "2026-03-30T00:00:00Z",
     categoryName: "Visual & Generative Art",
     visualMetadata: {
-      previewImageUrl: "/images/visual/vintage-1970s-road-trip.jpg",
+      previewImageUrl: "/images/visual/cinematic-imax-desert-monolith.jpg",
       previewImageAlt: "70mm IMAX sci-fi desert monolith composition",
       model: "midjourney",
       modelVersion: "v6.1",
@@ -730,7 +730,7 @@ export const PROMPTS_VISUAL: Prompt[] = [
     updatedAt: "2026-03-30T00:00:00Z",
     categoryName: "Visual & Generative Art",
     visualMetadata: {
-      previewImageUrl: "/images/visual/cyberpunk-tokyo-alleyway.jpg",
+      previewImageUrl: "/images/visual/wong-kar-wai-neon-romance.jpg",
       previewImageAlt: "Wong Kar-Wai style Hong Kong rain neon cinematography",
       model: "midjourney",
       modelVersion: "v6.1",
@@ -788,7 +788,7 @@ export const PROMPTS_VISUAL: Prompt[] = [
     updatedAt: "2026-03-30T00:00:00Z",
     categoryName: "Visual & Generative Art",
     visualMetadata: {
-      previewImageUrl: "/images/visual/vintage-1970s-road-trip.jpg",
+      previewImageUrl: "/images/visual/neo-western-golden-hour-desert-ridge.jpg",
       previewImageAlt: "Neo-western desert dusk silhouette cinematic frame",
       model: "midjourney",
       modelVersion: "v6.1",
@@ -846,7 +846,7 @@ export const PROMPTS_VISUAL: Prompt[] = [
     updatedAt: "2026-03-30T00:00:00Z",
     categoryName: "Visual & Generative Art",
     visualMetadata: {
-      previewImageUrl: "/images/visual/compare-cyberpunk-flux.jpg",
+      previewImageUrl: "/images/visual/underwater-submersible-bioluminescent-abyss.jpg",
       previewImageAlt: "Underwater abyssal cinematography with bioluminescent glow",
       model: "midjourney",
       modelVersion: "v6.1",
@@ -904,7 +904,7 @@ export const PROMPTS_VISUAL: Prompt[] = [
     updatedAt: "2026-03-30T00:00:00Z",
     categoryName: "Visual & Generative Art",
     visualMetadata: {
-      previewImageUrl: "/images/visual/rembrandt-lighting-elderly-artisan.jpg",
+      previewImageUrl: "/images/visual/leica-m11-street-candid-paris-rain.jpg",
       previewImageAlt: "Leica street candid Paris rain photography",
       model: "flux",
       modelVersion: "Dev 1.0",
@@ -962,7 +962,7 @@ export const PROMPTS_VISUAL: Prompt[] = [
     updatedAt: "2026-03-30T00:00:00Z",
     categoryName: "Visual & Generative Art",
     visualMetadata: {
-      previewImageUrl: "/images/visual/compare-portrait-flux.jpg",
+      previewImageUrl: "/images/visual/hasselblad-medium-format-beauty-portrait.jpg",
       previewImageAlt: "Hasselblad 100MP studio beauty portrait with skin micro-texture",
       model: "flux",
       modelVersion: "Dev 1.0",
@@ -1020,7 +1020,7 @@ export const PROMPTS_VISUAL: Prompt[] = [
     updatedAt: "2026-03-30T00:00:00Z",
     categoryName: "Visual & Generative Art",
     visualMetadata: {
-      previewImageUrl: "/images/visual/rembrandt-lighting-elderly-artisan.jpg",
+      previewImageUrl: "/images/visual/wet-plate-collodion-tintype-blacksmith.jpg",
       previewImageAlt: "19th-century wet-plate collodion tintype portrait",
       model: "midjourney",
       modelVersion: "v6.1",
@@ -1078,7 +1078,7 @@ export const PROMPTS_VISUAL: Prompt[] = [
     updatedAt: "2026-03-30T00:00:00Z",
     categoryName: "Visual & Generative Art",
     visualMetadata: {
-      previewImageUrl: "/images/visual/editorial-studio-fashion-portrait.jpg",
+      previewImageUrl: "/images/visual/national-geographic-arctic-wildlife.jpg",
       previewImageAlt: "National Geographic Arctic wildlife photography in snow",
       model: "flux",
       modelVersion: "Dev 1.0",
@@ -1136,7 +1136,7 @@ export const PROMPTS_VISUAL: Prompt[] = [
     updatedAt: "2026-03-30T00:00:00Z",
     categoryName: "Visual & Generative Art",
     visualMetadata: {
-      previewImageUrl: "/images/visual/vintage-1970s-road-trip.jpg",
+      previewImageUrl: "/images/visual/golden-hour-tokyo-subway-commuter.jpg",
       previewImageAlt: "Tokyo train interior with golden hour sunbeam window light",
       model: "midjourney",
       modelVersion: "v6.1",
@@ -1194,7 +1194,7 @@ export const PROMPTS_VISUAL: Prompt[] = [
     updatedAt: "2026-03-30T00:00:00Z",
     categoryName: "Visual & Generative Art",
     visualMetadata: {
-      previewImageUrl: "/images/visual/scandinavian-minimalist-living-room.jpg",
+      previewImageUrl: "/images/visual/biophilic-timber-high-rise-atrium.jpg",
       previewImageAlt: "Biophilic mass timber atrium architectural rendering",
       model: "midjourney",
       modelVersion: "v6.1",
@@ -1252,7 +1252,7 @@ export const PROMPTS_VISUAL: Prompt[] = [
     updatedAt: "2026-03-30T00:00:00Z",
     categoryName: "Visual & Generative Art",
     visualMetadata: {
-      previewImageUrl: "/images/visual/brutalist-concrete-cathedral.jpg",
+      previewImageUrl: "/images/visual/japanese-brutalist-concrete-tea-house.jpg",
       previewImageAlt: "Japanese brutalist concrete tea pavilion with moss garden",
       model: "midjourney",
       modelVersion: "v6.1",
@@ -1310,7 +1310,7 @@ export const PROMPTS_VISUAL: Prompt[] = [
     updatedAt: "2026-03-30T00:00:00Z",
     categoryName: "Visual & Generative Art",
     visualMetadata: {
-      previewImageUrl: "/images/visual/brutalist-concrete-cathedral.jpg",
+      previewImageUrl: "/images/visual/parametric-kinetic-facade-desert-center.jpg",
       previewImageAlt: "Parametric kinetic facade cultural center at dusk",
       model: "midjourney",
       modelVersion: "v6.1",

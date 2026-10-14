@@ -6,8 +6,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
-        disallow: ["/api/"],
+        allow: ["/", "/api/og"],
+        disallow: ["/api/private/"],
       },
       {
         userAgent: [
@@ -21,8 +21,8 @@ export default function robots(): MetadataRoute.Robots {
           "Applebot-Extended",
           "cohere-ai",
         ],
-        allow: "/",
-        disallow: ["/api/"],
+        allow: ["/", "/api/og"],
+        disallow: ["/api/private/"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
