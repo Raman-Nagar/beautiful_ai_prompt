@@ -42,6 +42,13 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const googleVerification =
+  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
+  process.env.GOOGLE_SITE_VERIFICATION;
+const bingVerification =
+  process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION ||
+  process.env.BING_SITE_VERIFICATION;
+
 export const metadata: Metadata = {
   title: {
     default: DEFAULT_TITLE,
@@ -63,7 +70,7 @@ export const metadata: Metadata = {
   publisher: SITE_NAME,
   metadataBase: new URL(SITE_URL),
   alternates: {
-    canonical: `${SITE_URL}/`,
+    canonical: SITE_URL,
   },
   icons: {
     icon: [
@@ -74,14 +81,10 @@ export const metadata: Metadata = {
       { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
-  verification:
-    process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || process.env.GOOGLE_SITE_VERIFICATION
-      ? {
-        google:
-          process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
-          process.env.GOOGLE_SITE_VERIFICATION,
-      }
-      : undefined,
+  verification: {
+    ...(googleVerification ? { google: googleVerification } : {}),
+    ...(bingVerification ? { other: { "msvalidate.01": [bingVerification] } } : {}),
+  },
   robots: {
     index: true,
     follow: true,
