@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { PromptsExplorer } from "@/components/prompts/prompts-explorer";
 import { PromptsExplorerSkeleton } from "@/components/prompts/prompts-explorer-skeleton";
 import {
+  getExplorerPrompts,
   getAllPrompts,
   getAllTags,
   getAllUseCases,
@@ -31,7 +32,7 @@ export const metadata: Metadata = constructMetadata({
 });
 
 export default function PromptsPage() {
-  const allPrompts = getAllPrompts();
+  const explorerPrompts = getExplorerPrompts();
   const allCategories = getAllCategories();
   const allModels = getAllModels();
   const popularTags = getAllTags();
@@ -47,7 +48,7 @@ export default function PromptsPage() {
               Verified Prompt Library
             </Badge>
             <span className="text-xs text-[var(--muted-foreground)]">
-              {allPrompts.length} Production Prompts Available
+              {explorerPrompts.length} Production Prompts Available
             </span>
           </div>
 
@@ -63,7 +64,7 @@ export default function PromptsPage() {
         {/* Interactive Discovery & Filtering Suite */}
         <Suspense fallback={<PromptsExplorerSkeleton />}>
           <PromptsExplorer
-            initialPrompts={allPrompts}
+            initialPrompts={explorerPrompts}
             categories={allCategories}
             models={allModels}
             popularTags={popularTags}

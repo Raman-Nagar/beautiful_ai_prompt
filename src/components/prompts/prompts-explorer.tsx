@@ -59,6 +59,8 @@ export function PromptsExplorer({
   const [engine, setEngine] = useState<"all" | "visual" | "text">(paramEngine);
   const [aspectRatio, setAspectRatio] = useState<string>(paramAspect);
   const [complexity, setComplexity] = useState<string>(paramComplexity);
+  const PAGE_SIZE = 24;
+  const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
 
   // Helper to sync state to URL params cleanly
   const updateUrlParams = useCallback(
@@ -247,6 +249,16 @@ export function PromptsExplorer({
     }
     return results;
   }, [search, category, model, difficulty, useCase, tag, sort, savedOnly, savedIds, engine, aspectRatio, complexity]);
+
+  // Reset pagination when active filters change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [search, category, model, difficulty, useCase, tag, sort, engine, aspectRatio, complexity, savedOnly]);
+
+  // Paginated prompts subset for rendering to prevent oversized HTML DOM
+  const displayedPrompts = useMemo(() => {
+    return filteredPrompts.slice(0, visibleCount);
+  }, [filteredPrompts, visibleCount]);
 
   // Track debounced search in explorer
   useEffect(() => {
@@ -701,11 +713,33 @@ export function PromptsExplorer({
 
       {/* Prompts Responsive Grid or Empty State */}
       {filteredPrompts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredPrompts.map((prompt) => (
-            <PromptCard key={prompt.id} prompt={prompt} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {displayedPrompts.map((prompt) => (
+              <PromptCard key={prompt.id} prompt={prompt} />
+            ))}
+          </div>
+
+          {/* Incremental Load More Pagination */}
+          {visibleCount < filteredPrompts.length && (
+            <div className="mt-12 flex flex-col items-center justify-center gap-3 pt-6 border-t border-[var(--border-subtle)]">
+              <p className="text-xs text-[var(--muted-foreground)]">
+                Showing <span className="font-semibold text-[var(--foreground)]">{displayedPrompts.length}</span> of{" "}
+                <span className="font-semibold text-[var(--foreground)]">{filteredPrompts.length}</span> prompts
+              </p>
+              <button
+                type="button"
+                onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--card)] px-6 py-2.5 text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--secondary)] hover:border-[var(--border-strong)] transition-all cursor-pointer shadow-xs active:scale-[0.98]"
+              >
+                <span>Load More Prompts</span>
+                <span className="font-mono text-[10px] text-[var(--muted-foreground)]">
+                  (+{Math.min(PAGE_SIZE, filteredPrompts.length - visibleCount)})
+                </span>
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <EmptyState
           variant={savedOnly ? "favorites" : "search"}

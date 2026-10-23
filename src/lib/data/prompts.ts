@@ -152,6 +152,38 @@ export function getAllPrompts(): Prompt[] {
 }
 
 /**
+ * Retrieves lightweight prompts optimized for search, filtering, and card rendering.
+ * Omits heavy multi-paragraph detail fields (exampleOutput, tips, commonMistakes) to
+ * reduce initial HTML document size and stay well under search-engine crawl limits.
+ */
+export function getExplorerPrompts(): Prompt[] {
+  return PROMPTS.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    shortDescription: p.shortDescription,
+    description: p.description,
+    category: p.category,
+    categoryName: p.categoryName || categoryMap.get(p.category) || p.category,
+    subcategory: p.subcategory,
+    difficulty: p.difficulty,
+    tags: p.tags,
+    compatibleModels: p.compatibleModels,
+    prompt: p.prompt,
+    variables: p.variables ? p.variables.map((v) => ({ name: v.name } as any)) : [],
+    exampleInput: {},
+    exampleOutput: "",
+    relatedPromptIds: [],
+    useCases: p.useCases,
+    featured: p.featured,
+    trending: p.trending,
+    createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
+    visualMetadata: p.visualMetadata,
+  }));
+}
+
+/**
  * Retrieves a single prompt by its unique ID (e.g. 'prompt-001')
  */
 export function getPromptById(id: string): Prompt | undefined {
