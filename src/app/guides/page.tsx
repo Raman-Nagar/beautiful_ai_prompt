@@ -3,6 +3,7 @@ import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
 import { getAllGuides, getFeaturedGuides } from "@/lib/data/guides";
 import { GuidesExplorer } from "@/components/guides/guides-explorer";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
 import {
   Sparkles,
   Layers,
@@ -13,7 +14,7 @@ import {
 import { constructMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = constructMetadata({
-  title: "AI Prompt Engineering Guides",
+  title: "AI Prompt Engineering Guides — Master ChatGPT, Claude & Midjourney",
   description:
     "Comprehensive guides for AI prompt engineering, software development, resume writing, interview preparation, marketing, and productivity.",
   path: "/guides",
@@ -35,7 +36,15 @@ export default function GuidesPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)] py-12 sm:py-16">
-      <Container>
+      {/* Semantic Breadcrumb Navigation with BreadcrumbList JSON-LD */}
+      <Breadcrumb
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Guides" },
+        ]}
+      />
+
+      <Container className="pt-6">
         {/* Header Hero Section */}
         <div className="max-w-3xl mb-12 space-y-4">
           <div className="inline-flex items-center gap-2">

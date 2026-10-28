@@ -301,12 +301,12 @@ export function PromptCard({ prompt, className }: PromptCardProps) {
         {/* ── Prompt Template Snippet Box (Balances Height with Visual Cards) ── */}
         <div className="my-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--secondary)]/40 p-3 font-mono text-[11px] leading-relaxed text-[var(--muted-foreground)] select-none">
           <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-[var(--border-subtle)] text-[10px] font-sans font-medium text-[var(--muted-foreground)]/80 uppercase tracking-wider">
-            <span className="flex items-center gap-1.5 text-[var(--primary)]">
+            <span className="flex items-center gap-1.5 text-[var(--primary)] font-semibold">
               <Terminal className="h-3 w-3" />
-              <span>Prompt Template</span>
+              <span>[Copy &amp; Paste Template]</span>
             </span>
             <span className="text-[10px] text-[var(--muted-foreground)]/70 font-mono lowercase">
-              {prompt.variables && prompt.variables.length > 0 ? `${prompt.variables.length} vars` : "verified"}
+              {prompt.variables && prompt.variables.length > 0 ? `${prompt.variables.length} parameters` : "benchmark verified"}
             </span>
           </div>
           <p className="line-clamp-2 text-[var(--foreground)]/85">

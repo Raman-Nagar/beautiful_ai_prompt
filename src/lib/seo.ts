@@ -22,6 +22,9 @@ import {
   generateCollectionJsonLd,
   generateGuideHowToJsonLd,
   generateFaqJsonLd,
+  getPromptFaqs,
+  getCollectionFaqs,
+  generateHomePageJsonLd,
 } from "./structured-data";
 
 export {
@@ -45,6 +48,9 @@ export {
   generateCollectionJsonLd,
   generateGuideHowToJsonLd,
   generateFaqJsonLd,
+  getPromptFaqs,
+  getCollectionFaqs,
+  generateHomePageJsonLd,
 };
 
 export const DEFAULT_TITLE = "Beautiful AI Prompt — Tested Prompts for Real-World Work";

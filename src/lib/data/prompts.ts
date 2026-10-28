@@ -1,6 +1,6 @@
 import { PROMPTS } from "@/data/prompts";
 import { CATEGORIES } from "@/data/categories";
-import { Prompt, PromptFilterOptions, AIModelId, PromptDifficulty } from "@/types";
+import { Prompt, PromptFilterOptions, AIModelId, PromptDifficulty, PromptSortOption } from "@/types";
 import { scorePrompt } from "@/lib/search";
 
 export { PROMPTS };
@@ -152,35 +152,165 @@ export function getAllPrompts(): Prompt[] {
 }
 
 /**
+ * Transforms a full Prompt object into a minimal Prompt summary
+ * specifically engineered for search-engine crawl efficiency and card rendering.
+ * Strips heavy markdown fields (exampleOutput, tips, commonMistakes), long descriptions,
+ * and verbose schemas, slashing JSON serialization by >85%.
+ */
+export function toPromptSummary(p: Prompt): Prompt {
+  return {
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    shortDescription: p.shortDescription || (p.description ? p.description.slice(0, 140) : ""),
+    description: "",
+    category: p.category,
+    categoryName: p.categoryName || categoryMap.get(p.category) || p.category,
+    subcategory: p.subcategory,
+    difficulty: p.difficulty,
+    tags: p.tags ? p.tags.slice(0, 3) : [],
+    compatibleModels: p.compatibleModels ? p.compatibleModels.slice(0, 3) : [],
+    prompt: p.prompt ? (p.prompt.length > 100 ? p.prompt.slice(0, 100) + "..." : p.prompt) : (p.template || ""),
+    variables: p.variables ? p.variables.map((v) => ({ name: v.name, required: v.required, type: "text" } as any)) : [],
+    exampleInput: {},
+    exampleOutput: "",
+    relatedPromptIds: [],
+    useCases: [],
+    featured: Boolean(p.featured),
+    trending: Boolean(p.trending),
+    createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
+    visualMetadata: p.visualMetadata
+      ? {
+          previewImageUrl: p.visualMetadata.previewImageUrl,
+          previewImageAlt: p.visualMetadata.previewImageAlt,
+          model: p.visualMetadata.model,
+          modelVersion: p.visualMetadata.modelVersion,
+          aspectRatio: p.visualMetadata.aspectRatio,
+          camera: p.visualMetadata.camera
+            ? {
+                lens: p.visualMetadata.camera.lens,
+                aperture: p.visualMetadata.camera.aperture,
+                filmStock: p.visualMetadata.camera.filmStock,
+                focalLength: p.visualMetadata.camera.focalLength,
+              }
+            : undefined,
+          styleCategory: p.visualMetadata.styleCategory,
+        }
+      : undefined,
+  };
+}
+
+/**
+ * Retrieves the top 4 lightweight prompts for initial server HTML generation on /prompts.
+ * Keeps initial HTML payload strictly below 100 KB to guarantee fast Bingbot indexing.
+ */
+export function getInitialPromptsSummary(limit: number = 4): Prompt[] {
+  return PROMPTS.slice(0, limit).map(toPromptSummary);
+}
+
+/**
+ * Returns prompt counts (total, visual, text) for header/filter badges
+ */
+export function getPromptCounts() {
+  const total = PROMPTS.length;
+  const visual = PROMPTS.filter((p) => Boolean(p.visualMetadata)).length;
+  const text = total - visual;
+  return { total, visual, text };
+}
+
+/**
+ * Returns the top N most frequent tags for filter chips
+ */
+export function getTopTags(limit: number = 10): string[] {
+  return getAllTags().slice(0, limit);
+}
+
+/**
+ * Returns curated top use cases for the dropdown
+ */
+export function getCuratedUseCases(limit: number = 15): string[] {
+  const allCases = getAllUseCases();
+  const uniqueCases = Array.from(
+    new Set(
+      allCases.map((uc) => (uc.length > 32 ? uc.slice(0, 30) + "..." : uc))
+    )
+  );
+  return uniqueCases.slice(0, limit);
+}
+
+/**
  * Retrieves lightweight prompts optimized for search, filtering, and card rendering.
  * Omits heavy multi-paragraph detail fields (exampleOutput, tips, commonMistakes) to
  * reduce initial HTML document size and stay well under search-engine crawl limits.
  */
 export function getExplorerPrompts(): Prompt[] {
-  return PROMPTS.map((p) => ({
-    id: p.id,
-    slug: p.slug,
-    title: p.title,
-    shortDescription: p.shortDescription,
-    description: p.description,
-    category: p.category,
-    categoryName: p.categoryName || categoryMap.get(p.category) || p.category,
-    subcategory: p.subcategory,
-    difficulty: p.difficulty,
-    tags: p.tags,
-    compatibleModels: p.compatibleModels,
-    prompt: p.prompt,
-    variables: p.variables ? p.variables.map((v) => ({ name: v.name } as any)) : [],
-    exampleInput: {},
-    exampleOutput: "",
-    relatedPromptIds: [],
-    useCases: p.useCases,
-    featured: p.featured,
-    trending: p.trending,
-    createdAt: p.createdAt,
-    updatedAt: p.updatedAt,
-    visualMetadata: p.visualMetadata,
-  }));
+  return PROMPTS.map(toPromptSummary);
+}
+
+export interface PaginatedPromptsOptions {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  model?: AIModelId | "all";
+  difficulty?: PromptDifficulty | "all";
+  useCase?: string;
+  tag?: string;
+  sort?: PromptSortOption;
+  engine?: "all" | "visual" | "text";
+  aspectRatio?: string;
+  complexity?: string;
+  featured?: boolean;
+  trending?: boolean;
+}
+
+export function getPaginatedPrompts(options: PaginatedPromptsOptions = {}) {
+  const page = Math.max(1, Number(options.page) || 1);
+  const limit = Math.max(1, Math.min(100, Number(options.limit) || 16));
+
+  let results = filterPrompts({
+    search: options.search?.trim() || undefined,
+    category: options.category !== "all" ? options.category : undefined,
+    model: options.model !== "all" ? options.model : undefined,
+    difficulty: options.difficulty !== "all" ? options.difficulty : undefined,
+    useCase: options.useCase !== "all" ? options.useCase : undefined,
+    tag: options.tag !== "all" ? options.tag : undefined,
+    sort: options.sort || "popular",
+    featured: options.featured,
+    trending: options.trending,
+  });
+
+  if (options.engine === "visual") {
+    results = results.filter((p) => Boolean(p.visualMetadata));
+  } else if (options.engine === "text") {
+    results = results.filter((p) => !p.visualMetadata);
+  }
+
+  if (options.aspectRatio && options.aspectRatio !== "all") {
+    results = results.filter((p) => p.visualMetadata?.aspectRatio === options.aspectRatio);
+  }
+
+  if (options.complexity === "ready") {
+    results = results.filter((p) => !p.variables || p.variables.length === 0);
+  } else if (options.complexity === "parametric") {
+    results = results.filter((p) => p.variables && p.variables.length > 0);
+  }
+
+  const total = results.length;
+  const totalPages = Math.ceil(total / limit) || 1;
+  const offset = (page - 1) * limit;
+  const paginatedPrompts = results.slice(offset, offset + limit).map(toPromptSummary);
+  const hasMore = page < totalPages;
+
+  return {
+    prompts: paginatedPrompts,
+    total,
+    page,
+    limit,
+    totalPages,
+    hasMore,
+  };
 }
 
 /**

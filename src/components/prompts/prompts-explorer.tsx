@@ -12,19 +12,60 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Prompt, PromptDifficulty, PromptSortOption, AIModelId } from "@/types/prompt";
 import { Category } from "@/types/category";
 import { AIModel } from "@/types/model";
-import { filterPrompts } from "@/lib/data/prompts";
 import { trackSearch, trackCategoryClick } from "@/lib/analytics";
 
 interface PromptsExplorerProps {
   initialPrompts: Prompt[];
+  totalCounts?: { total: number; visual: number; text: number };
   categories: Category[];
   models: AIModel[];
   popularTags: string[];
   useCases: string[];
 }
 
+interface SearchParamsState {
+  search: string;
+  category: string;
+  model: string;
+  difficulty: string;
+  useCase: string;
+  tag: string;
+  sort: PromptSortOption;
+  engine: "all" | "visual" | "text";
+  aspect: string;
+  complexity: string;
+  saved: boolean;
+}
+
+function SearchParamsWatcher({
+  onParamsSync,
+}: {
+  onParamsSync: (params: SearchParamsState) => void;
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    onParamsSync({
+      search: searchParams.get("search") || "",
+      category: searchParams.get("category") || "all",
+      model: searchParams.get("model") || "all",
+      difficulty: searchParams.get("difficulty") || "all",
+      useCase: searchParams.get("useCase") || "all",
+      tag: searchParams.get("tag") || "all",
+      sort: (searchParams.get("sort") as PromptSortOption) || "popular",
+      engine: (searchParams.get("engine") as "all" | "visual" | "text") || "all",
+      aspect: searchParams.get("aspect") || "all",
+      complexity: searchParams.get("complexity") || "all",
+      saved: searchParams.get("saved") === "true",
+    });
+  }, [searchParams, onParamsSync]);
+
+  return null;
+}
+
 export function PromptsExplorer({
   initialPrompts,
+  totalCounts,
   categories,
   models,
   popularTags,
@@ -32,35 +73,48 @@ export function PromptsExplorer({
 }: PromptsExplorerProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  // Read initial states from URL parameters
-  const paramSearch = searchParams.get("search") || "";
-  const paramCategory = searchParams.get("category") || "all";
-  const paramModel = searchParams.get("model") || "all";
-  const paramDifficulty = searchParams.get("difficulty") || "all";
-  const paramUseCase = searchParams.get("useCase") || "all";
-  const paramTag = searchParams.get("tag") || "all";
-  const paramSort = (searchParams.get("sort") as PromptSortOption) || "popular";
-  const paramEngine = (searchParams.get("engine") as "all" | "visual" | "text") || "all";
-  const paramAspect = searchParams.get("aspect") || "all";
-  const paramComplexity = searchParams.get("complexity") || "all";
-  const savedOnly = searchParams.get("saved") === "true";
+  // Local state initialized with clean defaults so server static generation produces all initial DOM & cards
+  const [search, setSearch] = useState<string>("");
+  const [category, setCategory] = useState<string>("all");
+  const [model, setModel] = useState<string>("all");
+  const [difficulty, setDifficulty] = useState<string>("all");
+  const [useCase, setUseCase] = useState<string>("all");
+  const [tag, setTag] = useState<string>("all");
+  const [sort, setSort] = useState<PromptSortOption>("popular");
+  const [engine, setEngine] = useState<"all" | "visual" | "text">("all");
+  const [aspectRatio, setAspectRatio] = useState<string>("all");
+  const [complexity, setComplexity] = useState<string>("all");
+  const [savedOnly, setSavedOnly] = useState<boolean>(false);
   const savedIds = useSavedPromptIds();
+  const PAGE_SIZE = 16;
 
-  // Local state initialized with URL params
-  const [search, setSearch] = useState<string>(paramSearch);
-  const [category, setCategory] = useState<string>(paramCategory);
-  const [model, setModel] = useState<string>(paramModel);
-  const [difficulty, setDifficulty] = useState<string>(paramDifficulty);
-  const [useCase, setUseCase] = useState<string>(paramUseCase);
-  const [tag, setTag] = useState<string>(paramTag);
-  const [sort, setSort] = useState<PromptSortOption>(paramSort);
-  const [engine, setEngine] = useState<"all" | "visual" | "text">(paramEngine);
-  const [aspectRatio, setAspectRatio] = useState<string>(paramAspect);
-  const [complexity, setComplexity] = useState<string>(paramComplexity);
-  const PAGE_SIZE = 24;
-  const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
+  const [promptsList, setPromptsList] = useState<Prompt[]>(initialPrompts);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(
+    totalCounts ? totalCounts.total > initialPrompts.length : true
+  );
+  const [totalCount, setTotalCount] = useState<number>(
+    totalCounts?.total ?? initialPrompts.length
+  );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const isInitialMount = React.useRef(true);
+
+  // Sync state if non-default URL parameters are detected after hydration
+  const handleParamsSync = useCallback((p: SearchParamsState) => {
+    if (p.search) setSearch(p.search);
+    if (p.category !== "all") setCategory(p.category);
+    if (p.model !== "all") setModel(p.model);
+    if (p.difficulty !== "all") setDifficulty(p.difficulty);
+    if (p.useCase !== "all") setUseCase(p.useCase);
+    if (p.tag !== "all") setTag(p.tag);
+    if (p.sort !== "popular") setSort(p.sort);
+    if (p.engine !== "all") setEngine(p.engine);
+    if (p.aspect !== "all") setAspectRatio(p.aspect);
+    if (p.complexity !== "all") setComplexity(p.complexity);
+    if (p.saved) setSavedOnly(true);
+  }, []);
 
   // Helper to sync state to URL params cleanly
   const updateUrlParams = useCallback(
@@ -77,7 +131,8 @@ export function PromptsExplorer({
       aspect?: string;
       complexity?: string;
     }) => {
-      const params = new URLSearchParams(searchParams.toString());
+      const currentQuery = typeof window !== "undefined" ? window.location.search : "";
+      const params = new URLSearchParams(currentQuery);
 
       Object.entries(newParams).forEach(([k, v]) => {
         if (!v || v === "all" || (k === "sort" && v === "popular") || (k === "saved" && !v)) {
@@ -93,7 +148,7 @@ export function PromptsExplorer({
       const targetUrl = queryString ? `${pathname}?${queryString}` : pathname;
       router.replace(targetUrl, { scroll: false });
     },
-    [pathname, router, searchParams]
+    [pathname, router]
   );
 
   // Handlers for state updates
@@ -153,6 +208,11 @@ export function PromptsExplorer({
     setEngine("all");
     setAspectRatio("all");
     setComplexity("all");
+    setSavedOnly(false);
+    setPromptsList(initialPrompts);
+    setCurrentPage(1);
+    setHasMore(totalCounts ? totalCounts.total > initialPrompts.length : true);
+    setTotalCount(totalCounts?.total ?? initialPrompts.length);
     router.replace(pathname, { scroll: false });
   };
 
@@ -214,51 +274,76 @@ export function PromptsExplorer({
     { value: "title", label: "Alphabetical (A–Z)" },
   ];
 
-  const visualCount = useMemo(
-    () => initialPrompts.filter((p) => Boolean(p.visualMetadata)).length,
-    [initialPrompts]
+  const visualCount = totalCounts?.visual ?? initialPrompts.filter((p) => Boolean(p.visualMetadata)).length;
+  const textCount = totalCounts?.text ?? (initialPrompts.length - visualCount);
+  const totalAvailableCount = totalCounts?.total ?? initialPrompts.length;
+
+  const fetchPrompts = useCallback(
+    async (targetPage: number = 1, append: boolean = false) => {
+      if (append) {
+        setIsLoadingMore(true);
+      } else {
+        setIsLoading(true);
+      }
+
+      try {
+        const queryParams = new URLSearchParams();
+        queryParams.set("page", String(targetPage));
+        queryParams.set("limit", String(PAGE_SIZE));
+        if (search.trim()) queryParams.set("search", search.trim());
+        if (category !== "all") queryParams.set("category", category);
+        if (model !== "all") queryParams.set("model", model);
+        if (difficulty !== "all") queryParams.set("difficulty", difficulty);
+        if (useCase !== "all") queryParams.set("useCase", useCase);
+        if (tag !== "all") queryParams.set("tag", tag);
+        if (sort !== "popular") queryParams.set("sort", sort);
+        if (engine !== "all") queryParams.set("engine", engine);
+        if (aspectRatio !== "all") queryParams.set("aspect", aspectRatio);
+        if (complexity !== "all") queryParams.set("complexity", complexity);
+
+        const res = await fetch(`/api/prompts?${queryParams.toString()}`);
+        if (!res.ok) throw new Error("Failed to fetch prompts");
+        const data = await res.json();
+
+        if (append) {
+          setPromptsList((prev) => [...prev, ...data.prompts]);
+        } else {
+          setPromptsList(data.prompts);
+        }
+
+        setCurrentPage(data.page);
+        setHasMore(data.hasMore);
+        setTotalCount(data.total);
+      } catch (err) {
+        console.error("Error loading prompts:", err);
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [search, category, model, difficulty, useCase, tag, sort, engine, aspectRatio, complexity]
   );
-  const textCount = initialPrompts.length - visualCount;
 
-  // Filter and sort prompts statically
-  const filteredPrompts = useMemo(() => {
-    let results = filterPrompts({
-      search: search.trim() || undefined,
-      category: category !== "all" ? category : undefined,
-      model: model !== "all" ? (model as AIModelId) : undefined,
-      difficulty: difficulty !== "all" ? (difficulty as PromptDifficulty) : undefined,
-      useCase: useCase !== "all" ? useCase : undefined,
-      tag: tag !== "all" ? tag : undefined,
-      sort,
-    });
-    if (savedOnly) {
-      results = results.filter((p) => savedIds.includes(p.id));
-    }
-    if (engine === "visual") {
-      results = results.filter((p) => Boolean(p.visualMetadata));
-    } else if (engine === "text") {
-      results = results.filter((p) => !p.visualMetadata);
-    }
-    if (aspectRatio !== "all") {
-      results = results.filter((p) => p.visualMetadata?.aspectRatio === aspectRatio);
-    }
-    if (complexity === "ready") {
-      results = results.filter((p) => !p.variables || p.variables.length === 0);
-    } else if (complexity === "parametric") {
-      results = results.filter((p) => p.variables && p.variables.length > 0);
-    }
-    return results;
-  }, [search, category, model, difficulty, useCase, tag, sort, savedOnly, savedIds, engine, aspectRatio, complexity]);
-
-  // Reset pagination when active filters change
+  // Trigger fetch when any filter changes, with debounce for search
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
-  }, [search, category, model, difficulty, useCase, tag, sort, engine, aspectRatio, complexity, savedOnly]);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
 
-  // Paginated prompts subset for rendering to prevent oversized HTML DOM
+    const timer = setTimeout(() => {
+      fetchPrompts(1, false);
+    }, search ? 350 : 0);
+
+    return () => clearTimeout(timer);
+  }, [search, category, model, difficulty, useCase, tag, sort, engine, aspectRatio, complexity, fetchPrompts]);
+
   const displayedPrompts = useMemo(() => {
-    return filteredPrompts.slice(0, visibleCount);
-  }, [filteredPrompts, visibleCount]);
+    if (savedOnly) {
+      return promptsList.filter((p) => savedIds.includes(p.id));
+    }
+    return promptsList;
+  }, [promptsList, savedOnly, savedIds]);
 
   // Track debounced search in explorer
   useEffect(() => {
@@ -267,13 +352,13 @@ export function PromptsExplorer({
     const timer = setTimeout(() => {
       trackSearch(
         trimmed,
-        filteredPrompts.length,
+        totalCount,
         "prompts_explorer",
         category !== "all" ? category : undefined
       );
     }, 600);
     return () => clearTimeout(timer);
-  }, [search, filteredPrompts.length, category]);
+  }, [search, totalCount, category]);
 
   // Check if any filter is currently applied
   const hasActiveFilters =
@@ -290,6 +375,11 @@ export function PromptsExplorer({
 
   return (
     <div className="space-y-8">
+      {/* Client-side URL search params synchronizer wrapped in zero-cost Suspense */}
+      <React.Suspense fallback={null}>
+        <SearchParamsWatcher onParamsSync={handleParamsSync} />
+      </React.Suspense>
+
       {/* ── Engine Switcher (Visual vs Text Prompts) ── */}
       <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-xl bg-[var(--secondary)]/60 border border-[var(--border-subtle)] w-fit">
         <button
@@ -304,7 +394,7 @@ export function PromptsExplorer({
         >
           <Sparkles className="h-3.5 w-3.5 text-[var(--primary)]" />
           <span>All Prompts</span>
-          <span className="text-[10px] opacity-60 font-mono">({initialPrompts.length})</span>
+          <span className="text-[10px] opacity-60 font-mono">({totalAvailableCount})</span>
         </button>
         <button
           type="button"
@@ -446,6 +536,7 @@ export function PromptsExplorer({
             aria-label="Filter to saved prompts"
             onClick={() => {
               const next = !savedOnly;
+              setSavedOnly(next);
               updateUrlParams({ search, category, model, difficulty, useCase, tag, sort, saved: next });
             }}
             className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-all cursor-pointer mr-1 ${
@@ -575,7 +666,7 @@ export function PromptsExplorer({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-semibold text-[var(--foreground)]">
-            Showing {filteredPrompts.length} of {initialPrompts.length} prompts
+            Showing {displayedPrompts.length} of {totalCount} prompts
           </span>
 
           {hasActiveFilters && (
@@ -711,35 +802,50 @@ export function PromptsExplorer({
         </div>
       </div>
 
-      {/* Prompts Responsive Grid or Empty State */}
-      {filteredPrompts.length > 0 ? (
+      {/* Prompts Responsive Grid, Loading State, or Empty State */}
+      {displayedPrompts.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 transition-opacity duration-200", isLoading && "opacity-50 pointer-events-none")}>
             {displayedPrompts.map((prompt) => (
               <PromptCard key={prompt.id} prompt={prompt} />
             ))}
           </div>
 
           {/* Incremental Load More Pagination */}
-          {visibleCount < filteredPrompts.length && (
+          {hasMore && !savedOnly && (
             <div className="mt-12 flex flex-col items-center justify-center gap-3 pt-6 border-t border-[var(--border-subtle)]">
               <p className="text-xs text-[var(--muted-foreground)]">
                 Showing <span className="font-semibold text-[var(--foreground)]">{displayedPrompts.length}</span> of{" "}
-                <span className="font-semibold text-[var(--foreground)]">{filteredPrompts.length}</span> prompts
+                <span className="font-semibold text-[var(--foreground)]">{totalCount}</span> prompts
               </p>
               <button
                 type="button"
-                onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
-                className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--card)] px-6 py-2.5 text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--secondary)] hover:border-[var(--border-strong)] transition-all cursor-pointer shadow-xs active:scale-[0.98]"
+                disabled={isLoadingMore}
+                onClick={() => fetchPrompts(currentPage + 1, true)}
+                className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--card)] px-6 py-2.5 text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--secondary)] hover:border-[var(--border-strong)] transition-all cursor-pointer shadow-xs active:scale-[0.98] disabled:opacity-60"
               >
-                <span>Load More Prompts</span>
-                <span className="font-mono text-[10px] text-[var(--muted-foreground)]">
-                  (+{Math.min(PAGE_SIZE, filteredPrompts.length - visibleCount)})
-                </span>
+                {isLoadingMore ? (
+                  <>
+                    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    <span>Loading Prompts...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Load More Prompts</span>
+                    <span className="font-mono text-[10px] text-[var(--muted-foreground)]">
+                      (+{Math.min(PAGE_SIZE, totalCount - displayedPrompts.length)})
+                    </span>
+                  </>
+                )}
               </button>
             </div>
           )}
         </>
+      ) : isLoading ? (
+        <div className="flex flex-col items-center justify-center py-16 gap-3">
+          <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-[var(--primary)] border-t-transparent" />
+          <p className="text-xs text-[var(--muted-foreground)]">Filtering verified prompt library...</p>
+        </div>
       ) : (
         <EmptyState
           variant={savedOnly ? "favorites" : "search"}

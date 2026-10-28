@@ -13,6 +13,7 @@ import {
   getRelatedCollections,
 } from "@/lib/data/collections";
 import { getCategoryById } from "@/lib/data/categories";
+import { toPromptSummary } from "@/lib/data/prompts";
 import {
   ArrowLeft,
   ChevronRight,
@@ -25,11 +26,18 @@ import {
   Users,
   Compass,
   ArrowRight,
+  HelpCircle,
 } from "lucide-react";
 import { GuideCard } from "@/components/guides/guide-card";
 import { getGuidesForCollection } from "@/lib/internal-links";
 
-import { constructMetadata, generateCollectionJsonLd, getDynamicOgImageUrl } from "@/lib/seo";
+import {
+  constructMetadata,
+  generateCollectionJsonLd,
+  generateFaqJsonLd,
+  getCollectionFaqs,
+  getDynamicOgImageUrl,
+} from "@/lib/seo";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 
 interface CollectionPageProps {
@@ -62,9 +70,14 @@ export async function generateMetadata({ params }: CollectionPageProps): Promise
     meta: `${collection.promptIds.length} Verified Prompts • Workflow Suite`,
   });
 
+  const promptCount = collection.promptIds.length;
+  const categoryLabel = collection.categoryName || collection.category;
+  const seoTitle = `${collection.title} - ${promptCount} Free Templates | Beautiful AI Prompt`;
+  const seoDescription = `[Copy & Paste] ${promptCount} multi-step ${categoryLabel.toLowerCase()} prompts for ChatGPT & Claude. Battle-tested workflow templates with live variables.`;
+
   return constructMetadata({
-    title: collection.title,
-    description: collection.shortDescription || collection.description,
+    title: seoTitle,
+    description: seoDescription,
     path: `/collections/${collection.slug}`,
     image: {
       url: ogImageUrl,
@@ -73,11 +86,16 @@ export async function generateMetadata({ params }: CollectionPageProps): Promise
     keywords: [
       ...(collection.tags || []),
       collection.category,
+      `${collection.title} prompt pack`,
+      `copy paste ${categoryLabel.toLowerCase()} prompts`,
+      "multi-step prompt workflow",
+      "system prompt playbook",
       "AI prompts collection",
       "curated prompt pack",
       "prompt engineering workflow",
       "productivity templates",
     ],
+    exactTitle: true,
     publishedTime: collection.createdAt,
     modifiedTime: collection.updatedAt || collection.createdAt,
   });
@@ -98,6 +116,8 @@ export default async function CollectionDetailPage({ params }: CollectionPagePro
 
   // Truthful JSON-LD Schema (CollectionPage) without any fake ratings or social proof
   const jsonLd = generateCollectionJsonLd(collection, prompts);
+  const faqs = getCollectionFaqs(collection, prompts);
+  const faqJsonLd = generateFaqJsonLd(faqs);
 
   return (
     <div className="min-h-screen bg-[var(--background)] pb-24">
@@ -106,6 +126,12 @@ export default async function CollectionDetailPage({ params }: CollectionPagePro
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
 
       {/* Semantic Breadcrumb Navigation with BreadcrumbList JSON-LD */}
       <Breadcrumb
@@ -421,7 +447,7 @@ export default async function CollectionDetailPage({ params }: CollectionPagePro
 
                   </div>
 
-                  <PromptCard prompt={prompt} className="flex-1" />
+                  <PromptCard prompt={toPromptSummary(prompt)} className="flex-1" />
                 </div>
               ))}
             </div>
@@ -506,6 +532,42 @@ export default async function CollectionDetailPage({ params }: CollectionPagePro
             </div>
           </section>
         )}
+
+        {/* ========================================================================= */}
+        {/* 7. FREQUENTLY ASKED QUESTIONS SECTION                                     */}
+        {/* ========================================================================= */}
+        <section className="mt-16 pt-12 border-t border-[var(--border)]">
+          <div className="max-w-2xl mb-8">
+            <div className="flex items-center gap-2 mb-1.5">
+              <HelpCircle className="h-4 w-4 text-[var(--primary)]" />
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+                Frequently Asked Questions About {collection.title}
+              </h2>
+            </div>
+            <p className="text-xs text-[var(--muted-foreground)]">
+              Workflow sequencing, model compatibility, and adaptation instructions.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {faqs.map((faq, idx) => (
+              <div
+                key={idx}
+                className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--card)] p-6 space-y-2.5"
+              >
+                <h3 className="text-sm font-bold text-[var(--foreground)] flex items-start gap-2">
+                  <span className="text-[var(--primary)] font-mono font-bold text-xs shrink-0 mt-0.5">
+                    {idx + 1}.
+                  </span>
+                  <span>{faq.question}</span>
+                </h3>
+                <p className="text-xs text-[var(--subtle-foreground)] leading-relaxed pl-5">
+                  {faq.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
       </Container>
     </div>
   );

@@ -38,7 +38,13 @@ import {
   Sliders,
 } from "lucide-react";
 
-import { constructMetadata, generatePromptJsonLd, getDynamicOgImageUrl } from "@/lib/seo";
+import {
+  constructMetadata,
+  generatePromptJsonLd,
+  generateFaqJsonLd,
+  getPromptFaqs,
+  getDynamicOgImageUrl,
+} from "@/lib/seo";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 
 interface PromptPageProps {
@@ -67,6 +73,21 @@ export async function generateMetadata({ params }: PromptPageProps): Promise<Met
   const category = getCategoryById(prompt.category);
   const categoryName = category?.name || prompt.categoryName || prompt.category;
 
+  // Resolve primary model brand for long-tail high-intent SEO queries
+  const isVisual = Boolean(prompt.visualMetadata);
+  const primaryModel = isVisual && prompt.visualMetadata
+    ? `${prompt.visualMetadata.model.toUpperCase()} ${prompt.visualMetadata.modelVersion || ""}`.trim()
+    : prompt.compatibleModels.includes("claude") && prompt.compatibleModels.includes("chatgpt")
+    ? "ChatGPT & Claude"
+    : prompt.compatibleModels[0]
+    ? prompt.compatibleModels[0].charAt(0).toUpperCase() + prompt.compatibleModels[0].slice(1)
+    : "AI";
+
+  const seoTitle = `${primaryModel} Prompt for ${prompt.title} - Free Template | Beautiful AI Prompt`;
+  const seoDescription = isVisual && prompt.visualMetadata
+    ? `[Copy & Paste] Tested ${primaryModel} prompt for ${prompt.title.toLowerCase()}. Includes camera settings, lighting specs & aspect ratios.`
+    : `[Copy & Paste] Tested ${primaryModel} prompt for ${prompt.title.toLowerCase()}. Customize ${prompt.variables.length} parameters with verified output benchmarks.`;
+
   const ogImageUrl = getDynamicOgImageUrl({
     title: prompt.title,
     type: "AI Prompt",
@@ -75,20 +96,32 @@ export async function generateMetadata({ params }: PromptPageProps): Promise<Met
   });
 
   return constructMetadata({
-    title: prompt.title,
-    description: prompt.shortDescription || prompt.description,
+    title: seoTitle,
+    description: seoDescription,
     path: `/prompts/${prompt.slug}`,
     image: {
       url: ogImageUrl,
-      alt: `${prompt.title} - AI Prompt Template`,
+      alt: `${prompt.title} - ${primaryModel} Prompt Template`,
     },
     keywords: [
       ...prompt.tags,
-      prompt.category,
-      "AI prompt",
-      "prompt engineering",
+      `${primaryModel} prompt for ${prompt.title.toLowerCase()}`,
+      `copy paste ${primaryModel.toLowerCase()} prompt`,
+      `ready to use ${prompt.title.toLowerCase()} template`,
+      `${categoryName} prompts`,
+      "system instructions",
+      "prompt variables",
+      "few-shot prompting",
+      ...(isVisual && prompt.visualMetadata
+        ? [
+            `aspect ratio ${prompt.visualMetadata.aspectRatio}`,
+            "photographic camera settings",
+            "lighting direction parameters",
+          ]
+        : ["temperature parameter", "hallucination prevention"]),
       ...prompt.compatibleModels,
     ],
+    exactTitle: true,
     type: "article",
     publishedTime: prompt.createdAt,
     modifiedTime: prompt.updatedAt || prompt.createdAt,
@@ -115,16 +148,28 @@ export default async function PromptDetailPage({ params }: PromptPageProps) {
       ? "primary"
       : "warning";
 
-  // Truthful JSON-LD Schema (TechArticle) without any fake ratings, reviews, or social proof
+  // Truthful JSON-LD Schema (SoftwareApplication, CreativeWork & TechArticle)
   const jsonLd = generatePromptJsonLd(prompt);
+
+  // High-signal FAQ data and FAQPage JSON-LD schema
+  const faqs = getPromptFaqs(prompt);
+  const faqJsonLd = generateFaqJsonLd(faqs);
 
   return (
     <div className="min-h-screen bg-[var(--background)] pb-24">
-      {/* Truthful JSON-LD Structured Data */}
+      {/* Truthful JSON-LD Structured Data: Prompt Item & SoftwareApplication */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      {/* FAQPage Structured Data */}
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
 
       {/* Semantic Breadcrumb Navigation with BreadcrumbList JSON-LD */}
       <Breadcrumb
@@ -200,6 +245,16 @@ export default async function PromptDetailPage({ params }: PromptPageProps) {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[var(--foreground)] leading-tight">
               {prompt.title}
             </h1>
+
+            {/* High-Intent Tool Relevance Bar */}
+            <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-[var(--primary)] pt-0.5">
+              <Cpu className="h-3.5 w-3.5 shrink-0" />
+              <span>
+                Optimized for {prompt.compatibleModels.map((m) => m.charAt(0).toUpperCase() + m.slice(1)).join(", ")}
+                {prompt.visualMetadata ? ` • ${prompt.visualMetadata.model.toUpperCase()} Engine` : ""}
+                {" "}• Verified Prompt Template
+              </span>
+            </div>
 
             {/* Short Description */}
             <p className="text-base text-[var(--subtle-foreground)] leading-relaxed">
@@ -474,15 +529,18 @@ export default async function PromptDetailPage({ params }: PromptPageProps) {
         )}
 
         {/* ===================================================================== */}
-        {/* Example Input / Output Benchmark                                      */}
+        {/* Example Output & Parameters Breakdown                                 */}
         {/* ===================================================================== */}
-        <section className="mb-14">
+        <section className="mb-14" aria-labelledby="example-output-parameters">
           <div className="mb-6">
-            <h2 className="text-xl font-bold tracking-tight text-[var(--foreground)]">
-              Example Execution & Benchmark Output
-            </h2>
+            <div className="flex items-center gap-2 mb-1">
+              <CheckCircle2 className="h-4 w-4 text-[var(--status-success)]" />
+              <h2 id="example-output-parameters" className="text-xl font-bold tracking-tight text-[var(--foreground)]">
+                Example Output &amp; Parameters Breakdown
+              </h2>
+            </div>
             <p className="text-xs text-[var(--muted-foreground)] mt-1">
-              Sample input arguments and the verified AI response demonstrating expected quality and formatting.
+              Inspect verified benchmark AI responses and review how parameters, system constraints, and input variables calibrate generation.
             </p>
           </div>
 
@@ -490,11 +548,11 @@ export default async function PromptDetailPage({ params }: PromptPageProps) {
             {/* Example Input */}
             <div className="lg:col-span-5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card)] p-5">
               <div className="flex items-center justify-between pb-3 mb-4 border-b border-[var(--border-subtle)]">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
-                  Sample Variables
-                </span>
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
+                  Parameters &amp; Variable Breakdown
+                </h3>
                 <Badge variant="outline" size="sm">
-                  Inputs
+                  {Object.keys(prompt.exampleInput).length} Inputs
                 </Badge>
               </div>
 
@@ -518,11 +576,11 @@ export default async function PromptDetailPage({ params }: PromptPageProps) {
             {/* Example Output */}
             <div className="lg:col-span-7 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card)] p-5">
               <div className="flex items-center justify-between pb-3 mb-4 border-b border-[var(--border-subtle)]">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
-                  Expected AI Response
-                </span>
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
+                  Verified AI Benchmark Response
+                </h3>
                 <Badge variant="success" size="sm">
-                  Verified Result
+                  Grounded Output
                 </Badge>
               </div>
 
@@ -616,6 +674,39 @@ export default async function PromptDetailPage({ params }: PromptPageProps) {
                 ))}
               </ul>
             </div>
+          </div>
+        </section>
+
+        {/* ===================================================================== */}
+        {/* Frequently Asked Questions (FAQ Section & FAQPage Schema)             */}
+        {/* ===================================================================== */}
+        <section className="mb-14 rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--card)] p-6 sm:p-8">
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-1">
+              <HelpCircle className="h-5 w-5 text-[var(--primary)]" />
+              <h2 className="text-xl font-bold tracking-tight text-[var(--foreground)]">
+                Frequently Asked Questions About This Prompt
+              </h2>
+            </div>
+            <p className="text-xs text-[var(--muted-foreground)]">
+              Technical guidance on model compatibility, parameter substitution, iteration techniques, and commercial usage.
+            </p>
+          </div>
+
+          <div className="divide-y divide-[var(--border-subtle)] space-y-4 pt-1">
+            {faqs.map((faq, idx) => (
+              <div key={idx} className={idx > 0 ? "pt-4" : ""}>
+                <h3 className="text-sm font-semibold text-[var(--foreground)] mb-1.5 flex items-start gap-2">
+                  <span className="text-[var(--primary)] font-mono font-bold text-xs shrink-0 mt-0.5">
+                    Q{idx + 1}.
+                  </span>
+                  <span>{faq.question}</span>
+                </h3>
+                <p className="text-xs text-[var(--subtle-foreground)] leading-relaxed pl-6">
+                  {faq.answer}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
 

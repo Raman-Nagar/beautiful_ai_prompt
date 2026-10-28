@@ -225,9 +225,57 @@ export default function PrivacyPolicyPage() {
               </section>
 
               {/* Section 8 */}
+              <section className="space-y-3">
+                <h2 className="text-lg font-bold text-[var(--foreground)]">
+                  8. Third-Party Advertising & Google AdSense Disclosures
+                </h2>
+                <p>
+                  To keep Beautiful AI Prompt free and accessible to developers, researchers, and creators worldwide,
+                  we may display advertising provided by third-party advertising partners, including Google AdSense.
+                </p>
+                <ul className="list-disc pl-5 space-y-1.5 text-xs text-[var(--foreground)]/80">
+                  <li>
+                    <strong>Third-Party Vendor Cookies</strong>: Third-party vendors, including Google, use cookies to
+                    serve ads based on a user&apos;s prior visits to this website or other websites across the Internet.
+                  </li>
+                  <li>
+                    <strong>Advertising Cookies & DART</strong>: Google&apos;s use of advertising cookies enables it and
+                    its partners to serve targeted ads to our users based on their visit to BeautifulAIPrompt.com and/or
+                    other sites on the Internet.
+                  </li>
+                  <li>
+                    <strong>User Opt-Out Mechanisms</strong>: Users may opt out of personalized advertising at any time by
+                    visiting{" "}
+                    <a
+                      href="https://www.google.com/settings/ads"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[var(--primary)] hover:underline font-semibold"
+                    >
+                      Google Ads Settings
+                    </a>{" "}
+                    or through the Digital Advertising Alliance at{" "}
+                    <a
+                      href="https://www.aboutads.info/choices/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[var(--primary)] hover:underline font-semibold"
+                    >
+                      www.aboutads.info
+                    </a>.
+                  </li>
+                  <li>
+                    <strong>Browser Cookie Controls</strong>: You can configure your browser to reject all cookies or notify
+                    you when a cookie is sent. Note that core prompt browsing and copying functionality remains 100% accessible
+                    even with all cookies disabled.
+                  </li>
+                </ul>
+              </section>
+
+              {/* Section 9 */}
               <section className="space-y-3 border-t border-[var(--border)] pt-8">
                 <h2 className="text-lg font-bold text-[var(--foreground)]">
-                  8. Questions & Contact
+                  9. Questions & Contact
                 </h2>
                 <p>
                   If you have questions regarding our privacy architecture or data practices, please reach

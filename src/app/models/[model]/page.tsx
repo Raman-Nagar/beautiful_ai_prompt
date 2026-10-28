@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { getAllModels, getModelById, getFullModelDetail } from "@/lib/data/models";
-import { getPromptsByModel } from "@/lib/data/prompts";
+import { getPromptsByModel, toPromptSummary } from "@/lib/data/prompts";
 import { generateModelJsonLd, generateBreadcrumbJsonLd, generateFaqJsonLd } from "@/lib/structured-data";
 import { constructMetadata } from "@/lib/seo";
 import { AIModelId } from "@/types/model";
@@ -354,19 +354,32 @@ export default async function ModelHubPage({ params }: ModelPageProps) {
               </div>
 
               <Link
-                href="/prompts"
+                href={`/prompts?model=${model.id}`}
                 className="text-xs font-semibold text-[var(--primary)] hover:underline self-start sm:self-auto"
               >
-                Browse All 235+ Prompts →
+                Browse All {prompts.length} {model.name} Prompts →
               </Link>
             </div>
 
             {prompts.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {prompts.map((prompt) => (
-                  <PromptCard key={prompt.id} prompt={prompt} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {prompts.slice(0, 18).map(toPromptSummary).map((prompt) => (
+                    <PromptCard key={prompt.id} prompt={prompt} />
+                  ))}
+                </div>
+
+                {prompts.length > 18 && (
+                  <div className="mt-10 text-center">
+                    <Link
+                      href={`/prompts?model=${model.id}`}
+                      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--secondary)] transition-all"
+                    >
+                      <span>Explore All {prompts.length} {model.name} Prompts in Interactive Explorer →</span>
+                    </Link>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-center py-12 rounded-xl border border-[var(--border)] bg-[var(--secondary)]/20 p-6">
                 <p className="text-sm text-[var(--muted-foreground)] mb-3">

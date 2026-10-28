@@ -1,18 +1,19 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, CANONICAL_DOMAIN } from "@/lib/canonical";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/api/og"],
+        allow: "/",
         disallow: ["/api/private/"],
       },
       {
         userAgent: [
-          "Bingbot",
           "Googlebot",
+          "Bingbot",
+          "Applebot",
           "GPTBot",
           "ChatGPT-User",
           "ClaudeBot",
@@ -21,11 +22,11 @@ export default function robots(): MetadataRoute.Robots {
           "Applebot-Extended",
           "cohere-ai",
         ],
-        allow: ["/", "/api/og"],
+        allow: "/",
         disallow: ["/api/private/"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL,
+    host: CANONICAL_DOMAIN,
   };
 }

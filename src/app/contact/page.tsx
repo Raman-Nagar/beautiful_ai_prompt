@@ -3,7 +3,7 @@ import { Container } from "@/components/layout/container";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { Card } from "@/components/ui/card";
 import { ContactForm } from "@/components/contact/contact-form";
-import { constructMetadata } from "@/lib/seo";
+import { constructMetadata, generateFaqJsonLd } from "@/lib/seo";
 import {
   MessageSquare,
   HelpCircle,
@@ -45,8 +45,16 @@ const FAQS = [
 ];
 
 export default function ContactPage() {
+  const faqJsonLd = generateFaqJsonLd(FAQS.map((f) => ({ question: f.q, answer: f.a })));
+
   return (
     <div className="bg-[var(--background)] min-h-screen pb-20">
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       <Breadcrumb
         items={[
           { label: "Home", href: "/" },

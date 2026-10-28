@@ -31,7 +31,7 @@ import {
   Zap,
 } from "lucide-react";
 import type { Metadata } from "next";
-import { constructMetadata } from "@/lib/seo";
+import { constructMetadata, generateHomePageJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = constructMetadata({
   title: "Beautiful AI Prompt — Tested Prompts for Real-World Work",
@@ -61,13 +61,20 @@ export default function Home() {
     .slice(0, 8);
   const featuredCollections = getFeaturedCollections().slice(0, 4);
   const latestGuides = getLatestGuides(3);
+  const homeJsonLd = generateHomePageJsonLd();
 
   return (
     <div className="flex flex-col min-h-screen bg-[var(--background)]">
+      {/* Schema.org WebApplication & SoftwareApplication Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeJsonLd) }}
+      />
+
       {/* =========================================================================
           HERO SECTION
           ========================================================================= */}
-            <section className="relative overflow-hidden border-b border-[var(--border)] pt-20 sm:pt-28 pb-24 bg-grid-mesh">
+      <section className="relative overflow-hidden border-b border-[var(--border)] pt-20 sm:pt-28 pb-24 bg-grid-mesh">
         {/* Dual ambient glow layers */}
         <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-[520px] w-[900px] rounded-full bg-indigo-500/[0.07] blur-[140px]" />
         <div className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 h-48 w-[500px] rounded-full bg-violet-500/[0.055] blur-[100px]" />

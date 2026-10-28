@@ -12,7 +12,7 @@ import {
   getCategoryBySlug,
   getRelatedCategories,
 } from "@/lib/data/categories";
-import { getPromptsByCategory } from "@/lib/data/prompts";
+import { getPromptsByCategory, toPromptSummary } from "@/lib/data/prompts";
 import {
   TrackedCategoryLink,
   TrackedCollectionLink,
@@ -27,11 +27,17 @@ import {
   Compass,
   BookOpen,
   ChevronRight,
+  HelpCircle,
 } from "lucide-react";
 import { GuideCard } from "@/components/guides/guide-card";
 import { getGuidesForCategory, getCollectionsForCategory } from "@/lib/internal-links";
 
-import { constructMetadata, generateCategoryJsonLd, getDynamicOgImageUrl } from "@/lib/seo";
+import {
+  constructMetadata,
+  generateCategoryJsonLd,
+  generateFaqJsonLd,
+  getDynamicOgImageUrl,
+} from "@/lib/seo";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 
 interface CategoryPageProps {
@@ -64,9 +70,14 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     meta: "Verified Prompts • Production Ready",
   });
 
+  const promptCount = category.count || 10;
+  const primaryKeyword = `${category.name} AI Prompts`;
+  const seoTitle = `${primaryKeyword} - ${promptCount} Free Templates | Beautiful AI Prompt`;
+  const seoDescription = `[Copy & Paste] ${promptCount}+ tested ${category.name.toLowerCase()} prompts for ChatGPT & Claude. Free templates with live variables, benchmark outputs & workflows.`;
+
   return constructMetadata({
-    title: `${category.name} AI Prompts`,
-    description: `Discover practical, verified AI prompts for ${category.name}. ${category.description}`,
+    title: seoTitle,
+    description: seoDescription,
     path: `/categories/${category.slug}`,
     image: {
       url: ogImageUrl,
@@ -74,10 +85,18 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     },
     keywords: [
       `${category.name} prompts`,
-      `${category.slug} AI`,
-      "prompt library",
+      `ChatGPT ${category.name} prompts`,
+      `Claude ${category.name} prompts`,
+      `copy paste ${category.name.toLowerCase()} prompt`,
+      `ready to use ${category.name.toLowerCase()} templates`,
+      `how to prompt ${category.name.toLowerCase()}`,
+      `best ${category.name} AI prompts`,
+      `${category.slug} prompt engineering`,
+      "system instructions",
+      "few-shot prompting",
       ...(category.subcategories || []),
     ],
+    exactTitle: true,
   });
 }
 
@@ -97,6 +116,27 @@ export default async function CategoryDetailPage({ params }: CategoryPageProps) 
   // Truthful JSON-LD Schema (CollectionPage) without any fake ratings
   const jsonLd = generateCategoryJsonLd(category, prompts);
 
+  // Contextual Category FAQs targeting the 5-Pillar Keyword Matrix
+  const categoryFaqs = [
+    {
+      question: `How do I find and use ready-to-use copy-paste ${category.name} prompts?`,
+      answer: `Select any ${category.name} prompt card above, open the in-browser customizer, fill in your workflow parameters (such as [ROLE], [CONTEXT], or [CONSTRAINTS]), and click Copy. Each template is pre-formatted with system instructions and few-shot constraints ready to paste into ChatGPT-4o, Claude 3.7, or Gemini 2.5.`,
+    },
+    {
+      question: `How do I prompt ChatGPT and Claude to avoid hallucinations in ${category.name} tasks?`,
+      answer: `To eliminate hallucinated claims, our ${category.name} templates enforce negative guardrails (e.g., "State 'Unknown' if data is missing"), demand structured schemas (tables or numbered execution steps), and ground the AI using explicit variable inputs before requesting analysis.`,
+    },
+    {
+      question: `Which AI model performs best for ${category.name} workflows?`,
+      answer: `For complex architectural logic, code generation, and deep reasoning, Claude 3.7 / 3.5 Sonnet and ChatGPT-4o yield the highest instruction adherence. For high-volume brainstorming and quick drafts, ChatGPT-4o excels. Check each prompt's compatibility badges for optimal temperature and model settings.`,
+    },
+    {
+      question: `Are these ${category.name} prompt templates free for commercial use?`,
+      answer: `Yes, 100%. All prompts published in our ${category.name} library are completely free and open for personal, agency, and enterprise use with zero attribution required.`,
+    },
+  ];
+  const faqJsonLd = generateFaqJsonLd(categoryFaqs);
+
   return (
     <div className="min-h-screen bg-[var(--background)] pb-24">
       {/* Truthful JSON-LD Structured Data */}
@@ -104,6 +144,14 @@ export default async function CategoryDetailPage({ params }: CategoryPageProps) 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      {/* FAQPage Structured Data */}
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
 
       {/* Semantic Breadcrumb Navigation with BreadcrumbList JSON-LD */}
       <Breadcrumb
@@ -245,7 +293,7 @@ export default async function CategoryDetailPage({ params }: CategoryPageProps) 
           </div>
 
           <CategoryPromptsView
-            initialPrompts={prompts}
+            initialPrompts={prompts.map(toPromptSummary)}
             categoryName={category.name}
             subcategories={category.subcategories}
           />
@@ -423,6 +471,40 @@ export default async function CategoryDetailPage({ params }: CategoryPageProps) 
             </div>
           </section>
         )}
+
+        {/* Frequently Asked Questions Section */}
+        <section className="pt-12 mt-12 border-t border-[var(--border)]">
+          <div className="max-w-2xl mb-8">
+            <div className="flex items-center gap-2 mb-1.5">
+              <HelpCircle className="h-4 w-4 text-[var(--primary)]" />
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+                Frequently Asked Questions About {category.name} Prompts
+              </h2>
+            </div>
+            <p className="text-xs text-[var(--muted-foreground)]">
+              Model selection, variable tailoring, and usage guidelines for {category.name}.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {categoryFaqs.map((faq, idx) => (
+              <div
+                key={idx}
+                className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--card)] p-6 space-y-2.5"
+              >
+                <h3 className="text-sm font-bold text-[var(--foreground)] flex items-start gap-2">
+                  <span className="text-[var(--primary)] font-mono font-bold text-xs shrink-0 mt-0.5">
+                    {idx + 1}.
+                  </span>
+                  <span>{faq.question}</span>
+                </h3>
+                <p className="text-xs text-[var(--subtle-foreground)] leading-relaxed pl-5">
+                  {faq.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
       </Container>
     </div>
   );
