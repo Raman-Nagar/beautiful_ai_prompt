@@ -29,6 +29,7 @@ import {
   BookOpen,
   ShieldCheck,
   Zap,
+  Flame,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { constructMetadata, generateHomePageJsonLd } from "@/lib/seo";
@@ -81,12 +82,18 @@ export default function Home() {
 
         <Container size="default">
           <div className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-7">
-            {/* Status pill */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--card)]/80 px-4 py-1.5 shadow-sm backdrop-blur-md">
-              <span className="flex h-1.5 w-1.5 rounded-full bg-[var(--status-success)] shadow-[0_0_6px_var(--status-success)] animate-pulse" />
-              <span className="text-[11px] font-medium tracking-wide text-[var(--muted-foreground)]">
-                Practical AI Prompts &nbsp;&middot;&nbsp; 100% Free &amp; Open
-              </span>
+            {/* Festive Trending Pill Link */}
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <Link
+                href="/prompts/diwali-ai-prompts"
+                className="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-[var(--card)] to-amber-500/10 px-4 py-1.5 shadow-sm backdrop-blur-md hover:border-amber-400 group transition-all"
+              >
+                <Flame className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
+                <span className="text-[11px] font-semibold tracking-wide text-amber-300">
+                  Trending: Diwali AI 3D Name Art &amp; Social Media Prompts (2026)
+                </span>
+                <ArrowRight className="h-3 w-3 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
             </div>
 
             {/* Headline */}
@@ -196,6 +203,32 @@ export default function Home() {
                 </div>
               </TrackedCategoryLink>
             ))}
+          </div>
+
+          {/* Festive Diwali Spotlight Card */}
+          <div className="mt-10 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/[0.12] via-[var(--card)] to-orange-500/[0.08] p-6 sm:p-8 backdrop-blur-md shadow-lg">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="space-y-2 max-w-2xl">
+                <div className="inline-flex items-center gap-2 rounded-full bg-amber-400/20 px-3 py-1 text-xs font-semibold text-amber-300 border border-amber-400/30">
+                  <Flame className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
+                  <span>Featured Festive Collection</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+                  Diwali AI Photo Editing Prompts &amp; 3D Name Art
+                </h3>
+                <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+                  20+ tested AI image prompts for Instagram 3D name art DPs, cinematic 4:5 couple portraits, 9:16 WhatsApp status backgrounds with copy space, 3D product sale podiums, and cute Pixar illustrations.
+                </p>
+              </div>
+
+              <Link
+                href="/prompts/diwali-ai-prompts"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 px-6 py-3.5 text-xs font-bold text-black shadow-md transition-all active:scale-95 shrink-0"
+              >
+                <span>Explore Diwali Prompts</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         </Container>
       </section>

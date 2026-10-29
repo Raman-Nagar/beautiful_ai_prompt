@@ -8,6 +8,7 @@ export function Footer() {
 
   const productLinks = [
     { label: "Prompts Directory", href: "/prompts" },
+    { label: "Diwali AI Prompts (3D & Festive)", href: "/prompts/diwali-ai-prompts" },
     { label: "AI Models & Guides", href: "/models" },
     { label: "Visual Styles Hub", href: "/styles" },
     { label: "Visual Prompt Generator", href: "/tools/prompt-generator" },
