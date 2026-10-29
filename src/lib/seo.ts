@@ -125,7 +125,7 @@ export function constructMetadata({
   const canonicalUrl = absoluteUrl(path);
 
   // Avoid duplicate brand suffixes if title already includes it
-  const cleanTitle = title
+  let cleanTitle = title
     .replace(/\s*\|\s*Beautiful AI Prompt$/i, "")
     .replace(/\s*—\s*Beautiful AI Prompt$/i, "")
     .trim();
@@ -140,9 +140,18 @@ export function constructMetadata({
         : `${truncated}.`;
   }
 
+  // Search Engine Optimization (Bingbot & Google SERP: keep titles strictly < 70 chars including HTML entities)
+  const brandSuffix = ` | ${SITE_NAME}`;
+  const willExceedLimitWithSuffix = (cleanTitle.length + brandSuffix.length) > 60;
+
   const isHomePage = path === "/" || path === "";
   const shouldUseAbsoluteTitle =
-    exactTitle || isHomePage || cleanTitle === DEFAULT_TITLE || cleanTitle === SITE_NAME;
+    exactTitle || isHomePage || cleanTitle === DEFAULT_TITLE || cleanTitle === SITE_NAME || willExceedLimitWithSuffix;
+
+  // If using absolute title and it exceeds 60 characters, trim cleanly at word boundary
+  if (shouldUseAbsoluteTitle && cleanTitle.length > 60) {
+    cleanTitle = cleanTitle.slice(0, 58).replace(/\s+\S*$/, "").trim();
+  }
 
   const baseKeywords = [
     "AI prompts",

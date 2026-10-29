@@ -25,7 +25,8 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "260+ Best AI Prompts for ChatGPT, Claude & Midjourney (Tested)",
+  title: "260+ Best AI Prompts for ChatGPT, Claude & Midjourney",
+  exactTitle: true,
   description:
     "Explore 260+ production-tested AI prompts for ChatGPT, Claude, Gemini, and Midjourney. Filter by model, difficulty, and task with live variable customizers.",
   path: "/prompts",

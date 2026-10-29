@@ -34,7 +34,8 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
-  title: "Diwali AI Photo Editing Prompts (2026) – 3D Name Art & Social Media Templates",
+  title: "Diwali AI Photo Editing Prompts & 3D Name Art (2026)",
+  exactTitle: true,
   description:
     "Copy 20+ tested Diwali AI photo editing prompts for Bing Image Creator, Midjourney & ChatGPT. Create Happy Diwali 3D AI images with your name, 9:16 story backgrounds & sale banners.",
   path: "/prompts/diwali-ai-prompts",
