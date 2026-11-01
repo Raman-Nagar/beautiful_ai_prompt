@@ -171,7 +171,7 @@ export function toPromptSummary(p: Prompt): Prompt {
     tags: p.tags ? p.tags.slice(0, 3) : [],
     compatibleModels: p.compatibleModels ? p.compatibleModels.slice(0, 3) : [],
     prompt: p.prompt ? (p.prompt.length > 100 ? p.prompt.slice(0, 100) + "..." : p.prompt) : (p.template || ""),
-    variables: p.variables ? p.variables.map((v) => ({ name: v.name, required: v.required, type: "text" } as any)) : [],
+    variables: p.variables ? p.variables.map((v) => ({ name: v.name, label: v.label || v.name, required: v.required, type: "text" as const })) : [],
     exampleInput: {},
     exampleOutput: "",
     relatedPromptIds: [],

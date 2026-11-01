@@ -4,6 +4,7 @@ import { PROMPTS_BATCH_2 } from "./prompts-batch-2";
 import { PROMPTS_BATCH_3 } from "./prompts-batch-3";
 import { PROMPTS_BATCH_4 } from "./prompts-batch-4";
 import { PROMPTS_VISUAL } from "./prompts-visual";
+import { PROMPTS_BATCH_SEMRUSH } from "./prompts-batch-semrush";
 
 const INITIAL_PROMPTS: Prompt[] = [
   // 1. Career
@@ -1672,4 +1673,5 @@ export const PROMPTS: Prompt[] = [
   ...PROMPTS_BATCH_3,
   ...PROMPTS_BATCH_4,
   ...PROMPTS_VISUAL,
+  ...PROMPTS_BATCH_SEMRUSH,
 ];

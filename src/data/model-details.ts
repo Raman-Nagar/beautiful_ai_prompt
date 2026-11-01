@@ -520,6 +520,23 @@ export const MODEL_DETAILS: Record<string, ModelDetail> = {
       rawPrompt: "Act as an experienced Head of Growth at a B2B SaaS startup.\n\nTask: Analyze our current onboarding drop-off rate of 42% on Day 3.\n\nRequirements:\n1. Provide 3 high-impact diagnostic hypotheses.\n2. Recommend 2 low-effort experiments to run this sprint.\n3. Output the final plan as a structured JSON object with keys: 'hypotheses', 'experiments', 'success_metrics'.\n4. Avoid buzzwords like 'seamlessly', 'synergy', and 'delve'.",
       explanation: "Combines role authority, clear numerical constraints, anti-filler negative rules, and machine-readable JSON structure.",
     },
+    faqs: [
+      {
+        question: "How do I prompt ChatGPT to generate professional headshots and realistic portrait photos?",
+        answer:
+          "Rather than using generic words like 'photorealistic' or '8K', specify real optical camera parameters: an 85mm portrait telephoto lens at f/2.0 aperture, large diffused octa softbox studio lighting, natural skin micro-textures with visible pores, and subtle neutral background bokeh. DALL-E 3 inside ChatGPT will render authentic human features rather than airbrushed plastic skin.",
+      },
+      {
+        question: "What are the most effective ChatGPT prompts for sales and social media marketing?",
+        answer:
+          "High-converting ChatGPT sales prompts require defining your Ideal Customer Profile (ICP), their acute business pain points, and current legacy alternatives. Instruct the model to avoid corporate buzzwords like 'synergy', 'game-changing', or 'delve', and ask for multi-touch cold outreach sequences or Facebook Marketplace listings with concrete objection-handling scripts.",
+      },
+      {
+        question: "What is a ChatGPT prompt splitter and when is it necessary?",
+        answer:
+          "A prompt splitter breaks large enterprise texts (such as 100-page contracts, financial statements, or multi-chapter books) into coherent chunks that fit comfortably within ChatGPT's token window without losing context. It assigns sequential markers so the model maintains state and reasoning across each segment.",
+      },
+    ],
   },
 
   gemini: {
@@ -584,6 +601,23 @@ export const MODEL_DETAILS: Record<string, ModelDetail> = {
       rawPrompt: "I have uploaded our entire 150-file repository context into this session.\n\nYour task:\n1. Audit all API route handlers for missing authentication middleware.\n2. Identify any unindexed database queries in the Prisma schema.\n3. Output a markdown table with columns: File Path, Line Number, Vulnerability Severity, Recommended Fix.",
       explanation: "Takes full advantage of the 2M token window to perform cross-file static analysis that smaller models cannot fit in memory.",
     },
+    faqs: [
+      {
+        question: "Can Google Gemini generate birthday prompts, milestone speeches, and cards for men and women?",
+        answer:
+          "Yes. Google Gemini excels at emotional nuance, humor, and natural conversational cadence. By providing 2-3 specific memories, milestone age brackets, and tone boundaries, Gemini generates highly customized birthday speeches for men, empowering celebration messages for women, and emotional keepsake card wishes ready to copy and paste.",
+      },
+      {
+        question: "What are Google prompting essentials for Gemini 1.5 and Gemini 2.0?",
+        answer:
+          "Google prompting essentials center on structured hierarchy: define a clear objective upfront, wrap raw context/artifacts in markdown blocks, provide explicit constraints and negative rules, and specify a strict output schema. Gemini's massive 2M token context window allows you to upload entire codebases or research papers without manual summarization.",
+      },
+      {
+        question: "Can I connect and deploy Google Gemini prompts into web applications or Vercel apps?",
+        answer:
+          "Yes. Google Gemini prompts can be deployed directly into Next.js and Vercel web applications using the Google Gen AI SDK (@google/genai) or the Vercel AI SDK. With low-latency models like Gemini 2.0 Flash, you can power real-time streaming interfaces, automated classification, and live chat experiences.",
+      },
+    ],
   },
 
   perplexity: {

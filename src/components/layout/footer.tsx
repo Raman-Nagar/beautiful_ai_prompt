@@ -18,7 +18,10 @@ export function Footer() {
     { label: "Composition Ruler", href: "/tools/composition-ruler" },
     { label: "Browse Categories", href: "/categories" },
     { label: "Curated Collections", href: "/collections" },
+    { label: "Model × Persona Matrix", href: "/matrix" },
+    { label: "Developer Agent Rules", href: "/rules" },
     { label: "Engineering Guides", href: "/guides" },
+    { label: "AI Blog & Insights", href: "/blog" },
   ];
 
   const categoryLinks = [
@@ -35,6 +38,9 @@ export function Footer() {
     { label: "Midjourney vs DALL-E 3", href: "/compare/midjourney-vs-dalle-3" },
     { label: "Parameter Reference Matrix", href: "/parameters" },
     { label: "Cinematic Optics Guide", href: "/styles/cinematic" },
+    { label: "Next.js 15 Cursorrules", href: "/rules/nextjs-cursorrules" },
+    { label: "ChatGPT Coding Matrix", href: "/matrix/chatgpt-prompts-for-coding" },
+    { label: "Claude Architecture Matrix", href: "/matrix/claude-prompts-for-software-architecture" },
     { label: "Midjourney Parameters", href: "/models/midjourney" },
     { label: "FLUX.1 Prompt Guide", href: "/models/flux" },
     { label: "SDXL Cheat Sheet", href: "/models/stable-diffusion" },

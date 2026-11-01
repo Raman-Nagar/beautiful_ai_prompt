@@ -2,6 +2,9 @@ import { Prompt } from "@/types/prompt";
 import { Category } from "@/types/category";
 import { Collection } from "@/types/collection";
 import { Guide } from "@/types/guide";
+import { BlogPost } from "@/types/blog";
+import { MatrixPage } from "@/types/matrix";
+import { DeveloperRule } from "@/types/rule";
 import { AIModel, ModelDetail } from "@/types/model";
 import { VisualStyle } from "@/types/style";
 import {
@@ -13,6 +16,9 @@ import {
   getGuideCanonicalUrl,
   getModelCanonicalUrl,
   getStyleCanonicalUrl,
+  getBlogCanonicalUrl,
+  getMatrixCanonicalUrl,
+  getRuleCanonicalUrl,
 } from "./canonical";
 
 export const SITE_NAME = "Beautiful AI Prompt";
@@ -537,3 +543,156 @@ export function generateHomePageJsonLd() {
   };
 }
 
+
+/**
+ * Generates Schema.org BlogPosting structured data for a blog article
+ */
+export function generateBlogPostingJsonLd(post: BlogPost) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.seoDescription || post.excerpt,
+    url: getBlogCanonicalUrl(post.slug),
+    inLanguage: "en-US",
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt || post.publishedAt,
+    keywords: (post.targetKeywords || []).join(", "),
+    author: {
+      "@type": "Organization",
+      name: post.author?.name || `${SITE_NAME} Research Team`,
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: `${SITE_URL}/favicon.ico`,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": getBlogCanonicalUrl(post.slug),
+    },
+  };
+}
+
+
+export const WIKIDATA_ENTITIES: Record<string, { name: string; url: string; description: string }> = {
+  Q115564437: { name: "ChatGPT", url: "https://www.wikidata.org/wiki/Q115564437", description: "AI chatbot developed by OpenAI" },
+  Q115664402: { name: "OpenAI", url: "https://www.wikidata.org/wiki/Q115664402", description: "Artificial intelligence research laboratory" },
+  Q117188168: { name: "Anthropic", url: "https://www.wikidata.org/wiki/Q117188168", description: "AI safety and research company" },
+  Q118235287: { name: "Claude", url: "https://www.wikidata.org/wiki/Q118235287", description: "Large language model family created by Anthropic" },
+  Q123689408: { name: "Gemini", url: "https://www.wikidata.org/wiki/Q123689408", description: "Multimodal AI model family developed by Google DeepMind" },
+  Q95: { name: "Google", url: "https://www.wikidata.org/wiki/Q95", description: "Technology company specializing in search and cloud computing" },
+  Q113163354: { name: "Midjourney", url: "https://www.wikidata.org/wiki/Q113163354", description: "Generative artificial intelligence program and service" },
+  Q110823377: { name: "Next.js", url: "https://www.wikidata.org/wiki/Q110823377", description: "Open-source React frontend development web framework created by Vercel" },
+  Q19399674: { name: "React", url: "https://www.wikidata.org/wiki/Q19399674", description: "JavaScript library for building user interfaces" },
+  Q9824: { name: "TypeScript", url: "https://www.wikidata.org/wiki/Q9824", description: "Strongly typed programming language that builds on JavaScript" },
+  Q28865: { name: "Python", url: "https://www.wikidata.org/wiki/Q28865", description: "High-level general-purpose programming language" },
+  Q105477461: { name: "FastAPI", url: "https://www.wikidata.org/wiki/Q105477461", description: "Modern, fast web framework for building APIs with Python" },
+  Q756100: { name: "Node.js", url: "https://www.wikidata.org/wiki/Q756100", description: "Cross-platform JavaScript runtime environment" },
+  Q192490: { name: "PostgreSQL", url: "https://www.wikidata.org/wiki/Q192490", description: "Open-source relational database management system" },
+  Q15133800: { name: "Docker", url: "https://www.wikidata.org/wiki/Q15133800", description: "Platform as a service product using OS-level virtualization" },
+  Q37227: { name: "Go", url: "https://www.wikidata.org/wiki/Q37227", description: "Statically typed, compiled programming language designed at Google" },
+  Q24578999: { name: "Angular", url: "https://www.wikidata.org/wiki/Q24578999", description: "TypeScript-based open-source web application framework" },
+  Q117075775: { name: "Prompt engineering", url: "https://www.wikidata.org/wiki/Q117075775", description: "Process of structuring text that can be interpreted and understood by a generative AI model" },
+};
+
+/**
+ * Generates Schema.org TechArticle & CollectionPage for a Model x Persona Matrix page
+ */
+export function generateMatrixJsonLd(page: MatrixPage) {
+  const entityAbouts = (page.wikidataEntityIds || [])
+    .filter((id) => WIKIDATA_ENTITIES[id])
+    .map((id) => ({
+      "@type": "Thing",
+      name: WIKIDATA_ENTITIES[id].name,
+      sameAs: WIKIDATA_ENTITIES[id].url,
+      description: WIKIDATA_ENTITIES[id].description,
+    }));
+
+  return {
+    "@context": "https://schema.org",
+    "@type": ["TechArticle", "CollectionPage"],
+    headline: page.title,
+    description: page.seoDescription || page.summary,
+    url: getMatrixCanonicalUrl(page.slug),
+    inLanguage: "en-US",
+    datePublished: page.publishedAt,
+    dateModified: page.updatedAt || page.publishedAt,
+    keywords: page.targetKeywords.join(", "),
+    author: {
+      "@type": "Organization",
+      name: `${SITE_NAME} AI Research`,
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: `${SITE_URL}/favicon.ico`,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": getMatrixCanonicalUrl(page.slug),
+    },
+    ...(entityAbouts.length > 0 ? { about: entityAbouts } : {}),
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: page.curatedPrompts.length,
+      itemListElement: page.curatedPrompts.map((item, idx) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        name: item.title,
+        description: item.description,
+      })),
+    },
+  };
+}
+
+/**
+ * Generates Schema.org TechArticle & SoftwareSourceCode for Developer Agent Rules
+ */
+export function generateRuleJsonLd(rule: DeveloperRule) {
+  const entityAbouts = (rule.wikidataEntityIds || [])
+    .filter((id) => WIKIDATA_ENTITIES[id])
+    .map((id) => ({
+      "@type": "Thing",
+      name: WIKIDATA_ENTITIES[id].name,
+      sameAs: WIKIDATA_ENTITIES[id].url,
+      description: WIKIDATA_ENTITIES[id].description,
+    }));
+
+  const primaryFile = rule.files[0];
+
+  return {
+    "@context": "https://schema.org",
+    "@type": ["TechArticle", "SoftwareSourceCode"],
+    headline: rule.title,
+    description: rule.seoDescription || rule.summary,
+    url: getRuleCanonicalUrl(rule.slug),
+    inLanguage: "en-US",
+    datePublished: rule.publishedAt,
+    dateModified: rule.updatedAt || rule.publishedAt,
+    keywords: rule.targetKeywords.join(", "),
+    programmingLanguage: rule.technology,
+    codeSampleType: "full",
+    text: primaryFile?.content || "",
+    author: {
+      "@type": "Organization",
+      name: `${SITE_NAME} Developer Experience`,
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: `${SITE_URL}/favicon.ico`,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": getRuleCanonicalUrl(rule.slug),
+    },
+    ...(entityAbouts.length > 0 ? { about: entityAbouts } : {}),
+  };
+}

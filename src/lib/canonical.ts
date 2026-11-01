@@ -107,6 +107,27 @@ export function getParameterCanonicalUrl(slug: string): string {
 }
 
 /**
+ * Canonical URL helper for blog articles
+ */
+export function getBlogCanonicalUrl(slug: string): string {
+  return absoluteUrl(`/blog/${encodeURIComponent(slug.trim())}`);
+}
+
+/**
+ * Canonical URL helper for Model x Persona Matrix pages
+ */
+export function getMatrixCanonicalUrl(slug: string): string {
+  return absoluteUrl(`/matrix/${encodeURIComponent(slug.trim())}`);
+}
+
+/**
+ * Canonical URL helper for Developer Rules pages
+ */
+export function getRuleCanonicalUrl(slug: string): string {
+  return absoluteUrl(`/rules/${encodeURIComponent(slug.trim())}`);
+}
+
+/**
  * Validates whether a given URL is a valid canonical content URL
  */
 export function isCanonicalUrl(url: string): boolean {

@@ -13,6 +13,7 @@ import {
   Sparkles,
   ArrowRight,
   BookOpen,
+  Ruler,
 } from "lucide-react";
 
 export const metadata: Metadata = constructMetadata({
@@ -229,6 +230,28 @@ export default function CompositionRulerPage() {
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            {/* Physical Measurement Tip Note */}
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
+              <div className="w-8 h-8 rounded-lg bg-[var(--primary)]/10 border border-[var(--primary)]/20 flex items-center justify-center text-[var(--primary)] shrink-0 mt-0.5">
+                <Ruler className="h-4 w-4" />
+              </div>
+              <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+                <strong className="font-semibold text-[var(--foreground)]">
+                  Physical Measurement Tip:
+                </strong>{" "}
+                Working with physical references alongside your digital compositions? Use this{" "}
+                <a
+                  href="https://onlinerulerscale.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-[var(--primary)] underline decoration-[var(--primary)]/40 underline-offset-4 hover:decoration-[var(--primary)] hover:text-[var(--primary)] transition-colors"
+                >
+                  online ruler scale
+                </a>{" "}
+                to measure small objects in centimeters, millimeters, or inches directly against your calibrated screen.
+              </p>
             </div>
 
             {/* CTA to Explore Visual Prompt Gallery */}

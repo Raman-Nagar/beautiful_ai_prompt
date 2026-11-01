@@ -100,6 +100,7 @@ export function Navbar() {
     { label: "Categories", href: "/categories", icon: <Layers className="h-4 w-4" /> },
     { label: "Collections", href: "/collections", icon: <BookmarkCheck className="h-4 w-4" /> },
     { label: "Guides", href: "/guides", icon: <BookOpen className="h-4 w-4" /> },
+    { label: "Blog", href: "/blog", icon: <BookOpen className="h-4 w-4" /> },
   ];
 
   const toolsList: ToolItem[] = [
