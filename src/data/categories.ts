@@ -17,7 +17,7 @@ export const CATEGORIES: Category[] = [
     description: "Transform bullet points into quantified impact statements and build ATS-friendly resumes.",
     icon: "FileText",
     featured: true,
-    subcategories: ["Bullet Point Refinement", "Executive Summary", "ATS Optimization", "Cover Letters"],
+    subcategories: ["Formatting & Keyword Optimization", "ATS Optimization", "Bullet Point Refinement", "Executive Summary", "Cover Letters"],
   },
   {
     id: "cat-job-interview",
@@ -71,7 +71,7 @@ export const CATEGORIES: Category[] = [
     description: "Draft investor memos, business models, unit economics analyses, and operational frameworks.",
     icon: "TrendingUp",
     featured: true,
-    subcategories: ["Investor Memos", "Unit Economics", "Strategy Frameworks", "PRDs"],
+    subcategories: ["Investor Updates & Founder Packs", "Website & Brand Strategy", "Investor Memos", "Unit Economics", "Strategy Frameworks", "PRDs"],
   },
   {
     id: "cat-marketing",
@@ -89,7 +89,7 @@ export const CATEGORIES: Category[] = [
     description: "Overcome enterprise objections, craft high-reply cold outbound, and close deals faster.",
     icon: "Target",
     featured: false,
-    subcategories: ["Cold Outbound", "Objection Handling", "Discovery Questions", "Contract Proposals"],
+    subcategories: ["ICP Scoring & Qualification", "FB Marketplace Listings", "Cold Outbound", "Objection Handling", "Discovery Questions", "Contract Proposals"],
   },
   {
     id: "cat-social-media",
@@ -107,7 +107,7 @@ export const CATEGORIES: Category[] = [
     description: "Script compelling videos, structure high-CTR title variations, and storyboard visual retention.",
     icon: "Video",
     featured: false,
-    subcategories: ["Video Scripting", "Title & CTR", "Hooks & Intros", "Pacing"],
+    subcategories: ["Viral Video Creation", "Visual Hook Retention", "Video Scripting", "Title & CTR", "Hooks & Intros", "Pacing"],
   },
   {
     id: "cat-content-creation",
@@ -206,7 +206,7 @@ export const CATEGORIES: Category[] = [
     description: "Optimize product detail pages, rewrite conversion copy, analyze customer review sentiment, and lift checkout rates.",
     icon: "ShoppingBag",
     featured: false,
-    subcategories: ["Product Pages", "Review Analysis", "Checkout Optimization", "Merchandising"],
+    subcategories: ["Shopify Flow AI Automations", "Customer Email Chains", "Product Pages", "Review Analysis", "Checkout Optimization", "Merchandising"],
   },
   {
     id: "cat-hr",
@@ -242,7 +242,7 @@ export const CATEGORIES: Category[] = [
     description: "Photorealistic portraits, cinematic lighting, architectural rendering, and camera prompt templates for Midjourney and FLUX.1.",
     icon: "Palette",
     featured: true,
-    subcategories: ["Cinematic Film", "Studio Portraits", "Architecture", "Product Photography", "Digital Art"],
+    subcategories: ["Professional Headshots & Portraits", "8K Upscaling & Restoration", "Cinematic Film", "Studio Portraits", "Architecture", "Product Photography", "Digital Art"],
   },
 ];
 

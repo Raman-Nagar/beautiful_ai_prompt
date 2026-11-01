@@ -4,4 +4,6 @@ export * from "./collections";
 export * from "./models";
 export * from "./guides";
 export * from "./visual-styles";
-
+export * from "./blog";
+export * from "./matrix";
+export * from "./rules";

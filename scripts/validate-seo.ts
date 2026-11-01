@@ -19,6 +19,9 @@ import { PROMPTS } from "../src/lib/data/prompts";
 import { CATEGORIES } from "../src/lib/data/categories";
 import { COLLECTIONS } from "../src/lib/data/collections";
 import { GUIDES } from "../src/lib/data/guides";
+import { BLOG_POSTS } from "../src/lib/data/blog";
+import { getAllMatrixPages } from "../src/lib/data/matrix";
+import { getAllDeveloperRules } from "../src/lib/data/rules";
 import { getAllModels } from "../src/lib/data/models";
 import { getAllVisualStyles } from "../src/lib/data/visual-styles";
 import { PARAMETERS } from "../src/lib/data/parameters";
@@ -42,6 +45,8 @@ import {
   generateStyleJsonLd,
   generateGuideHowToJsonLd,
   generateFaqJsonLd,
+  generateMatrixJsonLd,
+  generateRuleJsonLd,
 } from "../src/lib/structured-data";
 import { constructMetadata, getDynamicOgImageUrl } from "../src/lib/seo";
 import sitemap from "../src/app/sitemap";
@@ -73,6 +78,8 @@ function runSeoAudit() {
   const startTime = Date.now();
 
   const issues: ValidationIssue[] = [];
+  const matrixPages = getAllMatrixPages();
+  const developerRules = getAllDeveloperRules();
 
   // =========================================================================
   // 1. METADATA AUDIT
@@ -379,14 +386,17 @@ function runSeoAudit() {
 
   // Check expected count (21 static routes + dynamic entities + models + styles + parameters)
   const expectedTotal =
-    21 +
+    25 +
     PROMPTS.length +
     CATEGORIES.length +
     COLLECTIONS.length +
     GUIDES.length +
     models.length +
     visualStyles.length +
-    PARAMETERS.length;
+    PARAMETERS.length +
+    BLOG_POSTS.length +
+    matrixPages.length +
+    developerRules.length;
   console.log(`  • Sitemap Entries:      ${sitemapEntries.length} (Expected: ${expectedTotal})`);
 
   if (sitemapEntries.length !== expectedTotal) {
@@ -462,7 +472,19 @@ function runSeoAudit() {
     issues.push({ type: "error", category: "structured-data", message: "Invalid FAQPage schema" });
   }
 
-  console.log(`  ${colors.green}✔ Schema.org schemas verified (100% authentic, including HowTo & FAQPage).${colors.reset}`);
+  // Test Matrix schema
+  const sampleMatrixSchema = generateMatrixJsonLd(matrixPages[0]);
+  if (!sampleMatrixSchema || !sampleMatrixSchema["@type"] || !sampleMatrixSchema.url) {
+    issues.push({ type: "error", category: "structured-data", message: "Invalid Matrix schema" });
+  }
+
+  // Test Developer Rule schema
+  const sampleRuleSchema = generateRuleJsonLd(developerRules[0]);
+  if (!sampleRuleSchema || !sampleRuleSchema["@type"] || !sampleRuleSchema.url) {
+    issues.push({ type: "error", category: "structured-data", message: "Invalid Developer Rule schema" });
+  }
+
+  console.log(`  ${colors.green}✔ Schema.org schemas verified (100% authentic, including HowTo, FAQPage, Matrix & Rule).${colors.reset}`);
 
   // =========================================================================
   // 6. OPEN GRAPH & SOCIAL SHARING AUDIT

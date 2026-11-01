@@ -6,6 +6,9 @@ import { getAllGuides } from "@/lib/data/guides";
 import { getAllModels } from "@/lib/data/models";
 import { getAllVisualStyles } from "@/lib/data/visual-styles";
 import { getAllParameters } from "@/lib/data/parameters";
+import { getAllBlogPosts } from "@/lib/data/blog";
+import { getAllMatrixPages } from "@/lib/data/matrix";
+import { getAllDeveloperRules } from "@/lib/data/rules";
 import {
   absoluteUrl,
   getPromptCanonicalUrl,
@@ -15,6 +18,9 @@ import {
   getModelCanonicalUrl,
   getStyleCanonicalUrl,
   getParameterCanonicalUrl,
+  getBlogCanonicalUrl,
+  getMatrixCanonicalUrl,
+  getRuleCanonicalUrl,
 } from "@/lib/canonical";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -25,6 +31,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const models = getAllModels();
   const styles = getAllVisualStyles();
   const parameters = getAllParameters();
+  const posts = getAllBlogPosts();
+  const matrixPages = getAllMatrixPages();
+  const developerRules = getAllDeveloperRules();
 
   // Determine latest real update date across the active content catalog
   let maxTimestamp = 0;
@@ -178,6 +187,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    {
+      url: absoluteUrl("/blog"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "daily",
+      priority: 0.85,
+    },
+    {
+      url: absoluteUrl("/matrix"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: absoluteUrl("/rules"),
+      lastModified: latestCatalogDate,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
   ];
 
   // 2. Dynamic Prompts (225 items)
@@ -251,6 +278,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.85,
   }));
 
+    // 9. Dynamic Blog Articles (4 items)
+  const blogRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
+    url: getBlogCanonicalUrl(post.slug),
+    lastModified: new Date(post.updatedAt || post.publishedAt),
+    changeFrequency: "weekly",
+    priority: post.featured ? 0.9 : 0.8,
+  }));
+  // 10. Dynamic Model x Persona Matrix (25 items)
+  const matrixRoutes: MetadataRoute.Sitemap = matrixPages.map((page) => ({
+    url: getMatrixCanonicalUrl(page.slug),
+    lastModified: new Date(page.updatedAt || page.publishedAt),
+    changeFrequency: "weekly",
+    priority: 0.85,
+  }));
+
+  // 11. Dynamic Developer Rules (10 items)
+  const ruleRoutes: MetadataRoute.Sitemap = developerRules.map((rule) => ({
+    url: getRuleCanonicalUrl(rule.slug),
+    lastModified: new Date(rule.updatedAt || rule.publishedAt),
+    changeFrequency: "weekly",
+    priority: 0.85,
+  }));
+
+
   return [
     ...staticRoutes,
     ...promptRoutes,
@@ -260,5 +311,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...modelRoutes,
     ...styleRoutes,
     ...parameterRoutes,
+    ...blogRoutes,
+    ...matrixRoutes,
+    ...ruleRoutes,
   ];
 }

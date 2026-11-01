@@ -9,6 +9,9 @@ import {
   getCollectionCanonicalUrl,
   getGuideCanonicalUrl,
   isCanonicalUrl,
+  getBlogCanonicalUrl,
+  getMatrixCanonicalUrl,
+  getRuleCanonicalUrl,
 } from "./canonical";
 import {
   SITE_NAME,
@@ -25,6 +28,10 @@ import {
   getPromptFaqs,
   getCollectionFaqs,
   generateHomePageJsonLd,
+  generateBlogPostingJsonLd,
+  generateMatrixJsonLd,
+  generateRuleJsonLd,
+  WIKIDATA_ENTITIES,
 } from "./structured-data";
 
 export {
@@ -51,9 +58,16 @@ export {
   getPromptFaqs,
   getCollectionFaqs,
   generateHomePageJsonLd,
+  generateBlogPostingJsonLd,
+  getBlogCanonicalUrl,
+  getMatrixCanonicalUrl,
+  getRuleCanonicalUrl,
+  generateMatrixJsonLd,
+  generateRuleJsonLd,
+  WIKIDATA_ENTITIES,
 };
 
-export const DEFAULT_TITLE = "Beautiful AI Prompt — Tested Prompts for Real-World Work";
+export const DEFAULT_TITLE = "Beautiful AI Prompt — Production AI Prompts & Engineering Tools";
 export const TWITTER_HANDLE = "@beautifulaiprompt";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 

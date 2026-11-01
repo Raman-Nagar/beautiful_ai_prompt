@@ -3,5 +3,8 @@ export * from "./category";
 export * from "./collection";
 export * from "./prompt";
 export * from "./guide";
+export * from "./blog";
+export * from "./matrix";
+export * from "./rule";
 export * from "./analytics";
 export * from "./content-quality";

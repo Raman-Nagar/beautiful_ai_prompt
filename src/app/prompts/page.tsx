@@ -70,17 +70,8 @@ const PROMPTS_PAGE_FAQS = [
 export default function PromptsPage() {
   const initialPrompts = getInitialPromptsSummary(2);
   const promptCounts = getPromptCounts();
-  const allCategories = getAllCategories().map((c) => ({
-    id: c.id,
-    name: c.name,
-    slug: c.slug,
-    count: c.count,
-  })) as any;
-  const allModels = getAllModels().map((m) => ({
-    id: m.id,
-    name: m.name,
-    engine: m.engine,
-  })) as any;
+  const allCategories = getAllCategories();
+  const allModels = getAllModels();
   const popularTags = getTopTags(8);
   const allUseCases = getCuratedUseCases(10);
 
